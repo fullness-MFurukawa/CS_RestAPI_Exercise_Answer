@@ -2,14 +2,14 @@ CREATE DATABASE restapi_exercise CHARACTER SET utf8mb4 COLLATE utf8mb4_general_c
 USE restapi_exercise;
 CREATE TABLE product_category (
     id             INT         NOT NULL AUTO_INCREMENT,
-    category_uuid  CHAR(36)    NOT NULL UNIQUE DEFAULT (UUID()),
+    category_uuid  VARCHAR(36)    NOT NULL UNIQUE DEFAULT (UUID()),
     name           VARCHAR(20) DEFAULT NULL,
     PRIMARY KEY (id)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
 
 CREATE TABLE product (
     id            INT         NOT NULL AUTO_INCREMENT,
-    product_uuid  CHAR(36)    NOT NULL UNIQUE DEFAULT (UUID()),
+    product_uuid  VARCHAR(36)    NOT NULL UNIQUE DEFAULT (UUID()),
     name          VARCHAR(30) DEFAULT NULL,
     price         INT         DEFAULT NULL,
     category_id   INT         DEFAULT NULL,
@@ -20,7 +20,7 @@ CREATE TABLE product (
 
 CREATE TABLE product_stock (
     id           INT         NOT NULL AUTO_INCREMENT,
-    stock_uuid   CHAR(36)    NOT NULL UNIQUE DEFAULT (UUID()),
+    stock_uuid   VARCHAR(36)    NOT NULL UNIQUE DEFAULT (UUID()),
     stock        INT         DEFAULT NULL,
     product_id   INT         DEFAULT NULL,
     PRIMARY KEY (id),
