@@ -1,5 +1,5 @@
 using RestAPI_Exercise.Application.Exceptions;
-namespace RestAPI_Exercise.Application.Domains;
+namespace RestAPI_Exercise.Application.Domains.Models;
 /// <summary>
 /// 商品を表すドメインオブジェクト(集約ルート)
 /// </summary>

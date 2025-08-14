@@ -1,4 +1,4 @@
-using RestAPI_Exercise.Application.Domains;
+using RestAPI_Exercise.Application.Domains.Models;
 using RestAPI_Exercise.Application.Exceptions;
 
 namespace RestAPI_Exercise.Application.Tests.Applications.Domains;
