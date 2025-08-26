@@ -12,9 +12,9 @@ public class Product
     // 商品価格（0円以上）
     public int Price { get; private set; }
     // 商品カテゴリ（null不可）
-    public ProductCategory Category { get; private set; }
+    public ProductCategory? Category { get; private set; } = null;
     // 在庫情報（null不可）
-    public ProductStock Stock { get; private set; }
+    public ProductStock? Stock { get; private set; } = null;
 
     /// <summary>
     /// 再構築・復元用コンストラクタ（UUID指定）
@@ -22,18 +22,14 @@ public class Product
     /// <param name="productUuid">商品UUID</param>
     /// <param name="name">商品名</param>
     /// <param name="price">価格</param>
-    /// <param name="category">商品カテゴリ</param>
-    /// <param name="stock">在庫</param>
-    public Product(string productUuid, string name, int price, ProductCategory category, ProductStock stock)
+    public Product(string productUuid, string name, int price)
     {
         ValidateUuid(productUuid); // UUID形式検証
-        ProductUuid = productUuid;
         ValidateName(name);        // 商品名検証
-        Name = name;
         ValidatePrice(price);      // 価格検証
+        ProductUuid = productUuid;
+        Name = name;
         Price = price;
-        Category = category ?? throw new DomainException("カテゴリは必須です");
-        Stock = stock ?? throw new DomainException("在庫情報は必須です");
     }
 
     /// <summary>
@@ -41,13 +37,10 @@ public class Product
     /// </summary>
     /// <param name="name">商品名</param>
     /// <param name="price">価格</param>
-    /// <param name="category">カテゴリ</param>
-    /// <param name="stock">在庫</param>
-    public Product(string name, int price, ProductCategory category, ProductStock stock)
-        : this(Guid.NewGuid().ToString(), name, price, category, stock)
-    {
-    }
+    public Product(string name, int price)
+    : this(Guid.NewGuid().ToString(), name, price) {}
 
+   
     /// <summary>
     /// UUIDの形式検証
     /// </summary>

@@ -22,7 +22,9 @@ public class ProductTests
         var category = CreateCategory();
         var stock = CreateStock();
         // Act
-        var product = new Product(uuid, name, price, category, stock);
+        var product = new Product(uuid, name, price);
+        product.ChangeCategory(category);
+        product.ChangeStock(stock);
         // Assert
         Assert.AreEqual(uuid, product.ProductUuid);
         Assert.AreEqual(name, product.Name);
@@ -40,7 +42,9 @@ public class ProductTests
         var category = CreateCategory();
         var stock = CreateStock();
         // Act
-        var product = new Product(name, price, category, stock);
+        var product = new Product(name, price);
+        product.ChangeCategory(category);
+        product.ChangeStock(stock);
         // Assert
         Assert.IsTrue(Guid.TryParse(product.ProductUuid, out _));
         Assert.AreEqual(name, product.Name);
@@ -55,18 +59,15 @@ public class ProductTests
         var invalidUuid = "abcde";
         var name = "商品";
         var price = 100;
-        var category = CreateCategory();
-        var stock = CreateStock();
         // Act
-        _ = new Product(invalidUuid, name, price, category, stock);
+        _ = new Product(invalidUuid, name, price);
     }
 
     [TestMethod]
     [ExpectedException(typeof(DomainException))]
     public void コンストラクタ_商品名が空文字の場合は例外()
     {
-        _ = new Product(Guid.NewGuid().ToString(), "", 100,
-            CreateCategory(), CreateStock());
+        _ = new Product(Guid.NewGuid().ToString(), "", 100);
     }
 
     [TestMethod]
@@ -74,43 +75,29 @@ public class ProductTests
     public void コンストラクタ_商品名が31文字以上の場合は例外()
     {
         var name = new string('あ', 31); // 31文字
-        _ = new Product(Guid.NewGuid().ToString(), name, 100,
-            CreateCategory(), CreateStock());
+        _ = new Product(Guid.NewGuid().ToString(), name, 100);
     }
 
     [TestMethod]
     [ExpectedException(typeof(DomainException))]
     public void コンストラクタ_価格がマイナスの場合は例外()
     {
-        _ = new Product(Guid.NewGuid().ToString(), "正しい商品", -1,
-            CreateCategory(), CreateStock());
+        _ = new Product(Guid.NewGuid().ToString(), "正しい商品", -1);
     }
 
-    [TestMethod]
-    [ExpectedException(typeof(DomainException))]
-    public void コンストラクタ_カテゴリがnullの場合は例外()
-    {
-        _ = new Product(Guid.NewGuid().ToString(), "正しい商品", 100, null!, CreateStock());
-    }
 
-    [TestMethod]
-    [ExpectedException(typeof(DomainException))]
-    public void コンストラクタ_在庫がnullの場合は例外()
-    {
-        _ = new Product(Guid.NewGuid().ToString(), "正しい商品", 100, CreateCategory(), null!);
-    }
 
     [TestMethod]
     public void 商品名を変更できる()
     {
-        var product = new Product("旧商品", 500, CreateCategory(), CreateStock());
+        var product = new Product("旧商品", 500);
         product.ChangeName("新商品");
         Assert.AreEqual("新商品", product.Name);
     }
     [TestMethod]
     public void 価格を変更できる()
     {
-        var product = new Product("商品", 500, CreateCategory(), CreateStock());
+        var product = new Product("商品", 500);
         product.ChangePrice(800);
         Assert.AreEqual(800, product.Price);
     }
@@ -118,9 +105,8 @@ public class ProductTests
     [TestMethod]
     public void カテゴリを変更できる()
     {
-        var oldCategory = CreateCategory("旧カテゴリ");
         var newCategory = CreateCategory("新カテゴリ");
-        var product = new Product("商品", 500, oldCategory, CreateStock());
+        var product = new Product("商品", 500);
         product.ChangeCategory(newCategory);
         Assert.AreEqual("新カテゴリ", product.Category!.Name);
     }
@@ -128,9 +114,8 @@ public class ProductTests
     [TestMethod]
     public void 在庫を変更できる()
     {
-        var oldStock = CreateStock(5);
         var newStock = CreateStock(30);
-        var product = new Product("商品", 500, CreateCategory(), oldStock);
+        var product = new Product("商品", 500);
         product.ChangeStock(newStock);
         Assert.AreEqual(30, product.Stock!.Stock);
     }
@@ -139,16 +124,16 @@ public class ProductTests
     public void Equals_UUIDが同じであれば等価とみなされる()
     {
         var uuid = Guid.NewGuid().ToString();
-        var p1 = new Product(uuid, "A", 100, CreateCategory(), CreateStock());
-        var p2 = new Product(uuid, "B", 200, CreateCategory(), CreateStock());
+        var p1 = new Product(uuid, "A", 100);
+        var p2 = new Product(uuid, "B", 200);
         Assert.AreEqual(p1, p2);
     }
 
     [TestMethod]
     public void Equals_UUIDが異なれば非等価()
     {
-        var p1 = new Product("A", 100, CreateCategory(), CreateStock());
-        var p2 = new Product("B", 200, CreateCategory(), CreateStock());
+        var p1 = new Product("A", 100);
+        var p2 = new Product("B", 200);
         Assert.AreNotEqual(p1, p2);
     }
 }
