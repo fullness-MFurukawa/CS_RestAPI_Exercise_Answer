@@ -2,9 +2,7 @@ using RestAPI_Exercise.Application.Domains.Models;
 using RestAPI_Exercise.Application.Exceptions;
 using RestAPI_Exercise.Infrastructure.Adapters;
 using RestAPI_Exercise.Infrastructure.Entities;
-
 namespace RestAPI_Exercise.Infrastructure.Tests.Adapters;
-
 /// <summary>
 /// ドメインオブジェクト:ProductとProductEntityの相互変換クラスの単体テストドライバ
 /// </summary>
