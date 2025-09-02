@@ -34,7 +34,7 @@ public class ProductRepository : IProductRepository
         {
             // 登録する商品の商品カテゴリを取得する
             var category = await _context.ProductCategories
-                .FirstOrDefaultAsync(c => c.CategoryUuid == product.Category!.CategoryUuid);
+                .SingleOrDefaultAsync(c => c.CategoryUuid == product.Category!.CategoryUuid);
             if (category is null)
             {
                 throw new Exception($"Id:{product.Category!.CategoryUuid}の商品カテゴリは存在しません。");
@@ -60,7 +60,6 @@ public class ProductRepository : IProductRepository
         }
     }
 
-
     /// <summary>
     /// 指定された商品Idの商品と在庫、商品カテゴリを返す
     /// </summary>
@@ -75,7 +74,7 @@ public class ProductRepository : IProductRepository
                 .AsNoTracking()
                 .Include(p => p.ProductCategory)
                 .Include(p => p.ProductStock)
-                .FirstOrDefaultAsync(p => p.ProductUuid == id);
+                .SingleOrDefaultAsync(p => p.ProductUuid == id);
             if (entity is null)
             {
                 return null; // 該当商品が存在しない場合はnullを返す
@@ -167,7 +166,7 @@ public class ProductRepository : IProductRepository
         try
         {
             // 削除対象の商品を取得する
-            var entity = await _context.Products.FirstOrDefaultAsync(p => p.ProductUuid == id);
+            var entity = await _context.Products.SingleOrDefaultAsync(p => p.ProductUuid == id);
             if (entity is null)
             {
                 return false; // 該当商品が存在しない場合はfalseを返す

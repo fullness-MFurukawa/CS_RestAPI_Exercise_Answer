@@ -67,7 +67,7 @@ public class ProductCategoryRepository : IProductCategoryRepository
         {
             // 引数のUUIDで商品カテゴリを取得する
             var entity = await _context.ProductCategories
-                .FirstOrDefaultAsync(c => c.CategoryUuid == id);
+                .SingleOrDefaultAsync(c => c.CategoryUuid == id);
             if (entity is null)
             {
                 return null; // 存在しない場合はnullを返す

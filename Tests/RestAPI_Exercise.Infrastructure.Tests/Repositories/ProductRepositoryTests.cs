@@ -236,7 +236,20 @@ public class ProductRepositoryTests
                 tx.Rollback(); // トランザクションをロールバックする
                 tx.Dispose();  // トランザクションリソースを開放する
                 _testContext!.WriteLine("トランザクションをロールバックしました。");
-            } 
+            }
         });
+    }
+
+    [TestMethod("存在しない商品を変更するとfalseが返される")]
+    public async Task UpdateProduct_WhenProductDoesNotExist_ShouldReturnFalse()
+    {
+        // 変更データを準備する
+        var productStock = new ProductStock("828fb567-6f6b-11f0-954a-00155d1bd30a", 50);
+        var product = new Product("ac413f22-0cf1-490a-9635-7e9ca810e555", "ボールペン(黒)", 150);
+        product.ChangeStock(productStock);
+        // 商品を変更する
+        var result = await _productRepository.UpdateByIdAsync(product);
+        // falseが返されることを検証する
+        Assert.IsFalse(result);
     }
 }

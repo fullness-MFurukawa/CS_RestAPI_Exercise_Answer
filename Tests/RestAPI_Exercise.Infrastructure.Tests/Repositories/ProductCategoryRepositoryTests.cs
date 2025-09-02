@@ -80,6 +80,4 @@ public class ProductCategoryRepositoryTests
         // nullであることを検証する
         Assert.IsNull(category);
     }
-
-    
 }
