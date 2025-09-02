@@ -20,11 +20,11 @@ public interface IProductRepository
     Task<bool> UpdateByIdAsync(Product product);
 
     /// <summary>
-    /// 指定された商品Idの商品と在庫を返す
+    /// 指定された商品Idの商品と在庫、商品カテゴリを返す
     /// </summary>
     /// <param name="id">商品Id</param>
     /// <returns>Product または null</returns>
-    Task<Product> SelectByIdWithProductStockAsync(string id);
+    Task<Product?> SelectByIdWithProductStockAndProductCategoryAsync(string id);
 
     /// <summary>
     /// 指定されたキーワードで商品を部分一致検索して商品と在庫を取得する
@@ -32,4 +32,18 @@ public interface IProductRepository
     /// <param name="keyword">検索キーワード</param>
     /// <returns>Prodyctのリスト</returns>
     Task<List<Product>> SelectByNameLikeWithProductStockAsync(string keyword);
+
+    /// <summary>
+    /// 商品を削除する
+    /// </summary>
+    /// <param name="id">削除対象の商品Id(UUID)</param>
+    /// <returns>true:削除成功 false:削除失敗</returns>
+    Task<bool> DeleteByIdAsync(string id);
+
+    /// <summary>
+    /// 指定された商品名の存在有無を返す
+    /// </summary>
+    /// <param name="name">商品名</param>
+    /// <returns>true:存在する false:存在しない</returns> 
+    Task<bool> ExistsByNameAsync(string name);
 }

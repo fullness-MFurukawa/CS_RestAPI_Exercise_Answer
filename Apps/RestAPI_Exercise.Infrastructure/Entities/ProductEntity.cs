@@ -35,7 +35,7 @@ public class ProductEntity
     public ProductCategoryEntity? ProductCategory { get; set; }
 
     // 在庫情報（1:1 関係を想定）
-    [ForeignKey("ProductId")]
+    //[ForeignKey("ProductId")]
     public ProductStockEntity? ProductStock { get; set; }
 
     public override string ToString()

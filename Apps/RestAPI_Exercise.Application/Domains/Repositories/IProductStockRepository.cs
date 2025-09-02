@@ -17,5 +17,5 @@ public interface IProductStockRepository
     /// </summary>
     /// <param name="productStock">更新対象の商品在庫</param>
     /// <returns>true:更新成功 false:更新失敗</returns>
-    Task<bool> UpdateByIdAync(ProductStock productStock);
+    Task<bool> UpdateByIdAsync(ProductStock productStock);
 }

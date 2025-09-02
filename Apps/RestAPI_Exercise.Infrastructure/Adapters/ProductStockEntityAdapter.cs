@@ -4,7 +4,7 @@ using RestAPI_Exercise.Application.Exceptions;
 using RestAPI_Exercise.Infrastructure.Entities;
 namespace RestAPI_Exercise.Infrastructure.Adapters;
 /// <summary>
-/// ドメインオブジェクト:DepartmentとDepartmentEntityの相互変換クラス
+/// ドメインオブジェクト:ProductSctockとProductStockEntityの相互変換クラス
 /// </summary> 
 /// <typeparam name="ProductStock">ドメインオブジェクト:ProductStock</typeparam>
 /// <typeparam name="ProductStockEntity">EFCore:ProductStockEntity</typeparam>
