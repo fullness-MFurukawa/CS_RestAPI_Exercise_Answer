@@ -1,7 +1,10 @@
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using RestAPI_Exercise.Application.Domains.Models;
 using RestAPI_Exercise.Application.Exceptions;
 using RestAPI_Exercise.Infrastructure.Adapters;
 using RestAPI_Exercise.Infrastructure.Entities;
+using RestAPI_Exercise.Presentation.Configs;
 namespace RestAPI_Exercise.Infrastructure.Tests.Adapters;
 /// <summary>
 /// ドメインオブジェクト:DepartmentとDepartmentEntityの相互変換クラスの単体テストドライバ
@@ -12,15 +15,44 @@ public class ProductStockEntityAdapterTests
 {
     // テストターゲット
     private ProductStockEntityAdapter _adapter = null!;
+    private static ServiceProvider? _provider;
+    private IServiceScope? _scope;
 
     /// <summary>
-    ///  テストの前処理
+    /// テストクラスの初期化
+    /// </summary>
+    /// <param name="_"></param>
+    [ClassInitialize]
+    public static void ClassInit(TestContext _)
+    {
+        var config = new ConfigurationBuilder()
+            .SetBasePath(AppContext.BaseDirectory)
+            .AddJsonFile("appsettings.json", optional: false)
+            .Build();
+        _provider = ApplicationDependencyExtensions.BuildAppProvider(config);
+    }
+
+    [ClassCleanup]
+    public static void ClassCleanup()
+    {
+        _provider?.Dispose();
+    }   
+
+    /// <summary>
+    /// テストの前処理
     /// </summary>
     [TestInitialize]
-    public void SetUp()
+    public void TestInit()
     {
-        // テストターゲットの生成
-        _adapter = new ProductStockEntityAdapter();
+        _scope = _provider!.CreateScope();
+        _adapter =
+        _scope.ServiceProvider.GetRequiredService<ProductStockEntityAdapter>();  
+    }
+
+    [TestCleanup]
+    public void TestCleanup()
+    {
+        _scope!.Dispose();
     }
 
     [TestMethod("ProductStockからProductStockEntityに変換できる")]

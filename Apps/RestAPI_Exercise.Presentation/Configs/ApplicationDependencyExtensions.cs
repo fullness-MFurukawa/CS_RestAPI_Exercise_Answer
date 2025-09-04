@@ -1,5 +1,13 @@
+using Microsoft.EntityFrameworkCore;
+using RestAPI_Exercise.Infrastructure.Contexts;
+using RestAPI_Exercise.Infrastructure.Adapters;
+using RestAPI_Exercise.Application.Domains.Repositories;
+using RestAPI_Exercise.Infrastructure.Repositories;
+using RestAPI_Exercise.Application.Usecases;
+using RestAPI_Exercise.Infrastructure.Shared;
+using RestAPI_Exercise.Application.Usecases.Products.Interfaces;
+using RestAPI_Exercise.Application.Usecases.Products.Interactors;
 namespace RestAPI_Exercise.Presentation.Configs;
-
 /// <summary>
 /// 依存関係(DI)の設定
 /// インフラストラクチャ層、アプリケーション層、プレゼンテーション層をまとめて追加する拡張クラス
@@ -28,6 +36,27 @@ public static class ApplicationDependencyExtensions
     private static IServiceCollection AddInfrastructureDependencies(
         this IServiceCollection services, IConfiguration config)
     {
+        // DbContext の登録
+        var connectstr = config.GetConnectionString("MySqlConnection");
+        services.AddDbContext<AppDbContext>(options =>
+        {
+            options.LogTo(Console.WriteLine, LogLevel.Debug);
+            options.UseMySql(connectstr, ServerVersion.AutoDetect(connectstr));
+        });
+        // ドメインオブジェクト:ProductSctockとProductStockEntityの相互変換クラス
+        services.AddScoped<ProductStockEntityAdapter>();
+        // ドメインオブジェクト:ProductCategoryとProductCategoryEntityの相互変換クラス
+        services.AddScoped<ProductCategoryEntityAdapter>();
+        // ドメインオブジェクト:ProductとProductEntityの相互変換クラス
+        services.AddScoped<ProductEntityAdapter>();
+        // 商品、商品カテゴリ、商品在庫オブジェクトの相互変換Factoryクラス
+        services.AddScoped<ProductFactory>();
+        // ドメインオブジェクト:商品カテゴリのCRUD操作Repositoryインターフェイス
+        services.AddScoped<IProductCategoryRepository, ProductCategoryRepository>();
+        // ドメインオブジェクト:商品のCRUD操作Repositoryインターフェイス
+        services.AddScoped<IProductRepository, ProductRepository>();
+        // Unit of Workパターンを利用したトランザクション制御インターフェイス
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
         return services;
     }
 
@@ -36,6 +65,8 @@ public static class ApplicationDependencyExtensions
     /// </summary>
     private static IServiceCollection AddApplicationLayerDependencies(this IServiceCollection services)
     {
+        // ユースケース:[新商品を登録する]を実現するインターフェイ
+        services.AddScoped<IRegisterProductUsecase, RegisterProductUsecase>();
         return services;
     }
 
@@ -45,5 +76,29 @@ public static class ApplicationDependencyExtensions
     private static IServiceCollection AddPresentationLayerDependencies(this IServiceCollection services)
     {
         return services;
+    }
+
+    /// <summary>
+    /// テストプロジェクトにServiceProviderを提供するヘルパメソッド
+    /// </summary>
+    /// <param name="config"></param>
+    /// <param name="configureServices"></param>
+    /// <param name="configureLogging"></param>
+    /// <returns></returns>
+    public static ServiceProvider BuildAppProvider(
+       IConfiguration config,
+       Action<IServiceCollection>? configureServices = null,
+       Action<ILoggingBuilder>? configureLogging = null)
+    {
+        var services = new ServiceCollection();
+        services.AddLogging(b =>
+        {
+            if (configureLogging is not null) configureLogging(b);
+            else b.AddConsole().SetMinimumLevel(LogLevel.Warning);
+        });
+        services.AddApplicationDependencies(config);
+        configureServices?.Invoke(services);
+
+        return services.BuildServiceProvider(validateScopes: true);
     }
 }

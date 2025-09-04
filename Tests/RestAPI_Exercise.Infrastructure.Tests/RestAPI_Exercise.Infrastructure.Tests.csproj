@@ -11,10 +11,15 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Apps\RestAPI_Exercise.Infrastructure\RestAPI_Exercise.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Apps\RestAPI_Exercise.Presentation\RestAPI_Exercise.Presentation.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="9.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.8" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.0" />
+    <PackageReference Include="Moq" Version="4.20.72" />
     <PackageReference Include="MSTest.TestAdapter" Version="3.0.4" />
     <PackageReference Include="MSTest.TestFramework" Version="3.0.4" />
     <PackageReference Include="coverlet.collector" Version="6.0.0" />

@@ -1,6 +1,9 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using RestAPI_Exercise.Infrastructure.Contexts;
 using RestAPI_Exercise.Infrastructure.Entities;
+using RestAPI_Exercise.Presentation.Configs;
 namespace RestAPI_Exercise.Infrastructure.Tests.Contexts;
 /// <summary>
 /// アプリケーション用DbContextの単体テストドライバ
@@ -9,30 +12,53 @@ namespace RestAPI_Exercise.Infrastructure.Tests.Contexts;
 public class AddDbContextTests
 {
     private static TestContext? _testContext;
+    private static ServiceProvider? _provider;
+    private IServiceScope? _scope;
+
+    private static AppDbContext? _dbContext;
+
     [ClassInitialize]
     public static void ClassInit(TestContext context)
     {
         // MSTestテスト用ログ出力ハンドルを設定する
         _testContext = context;
+        var config = new ConfigurationBuilder()
+            .SetBasePath(AppContext.BaseDirectory)
+            .AddJsonFile("appsettings.json", optional: false)
+            .Build();
+        _provider = ApplicationDependencyExtensions.BuildAppProvider(config);
+    }
+
+    [ClassCleanup]
+    public static void ClassCleanup()
+    {
+        _provider?.Dispose();
+    }
+
+    /// <summary>
+    /// テストの前処理
+    /// </summary>
+    [TestInitialize]
+    public void TestInit()
+    {
+        _scope = _provider!.CreateScope();
+        _dbContext =
+        _scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    }
+
+    [TestCleanup]
+    public void TestCleanup()
+    {
+        _scope!.Dispose();
     }
 
     [TestMethod("データベース接続ができる")]
     public void DbConnect_ShouldSucceed()
     {
-        // 接続文字列
-        var connectionString =
-        "Server=localhost;Port=3306;Database=restapi_exercise;User Id=root;Password=root;";
-        // データベース接続オプションを生成する
-        var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 36)),
-                mySqlOptions => mySqlOptions.EnableRetryOnFailure())
-            .Options;
-        // AppDbContextを生成する
-        var context = new AppDbContext(options);
         try
         {
             // データベースに接続する
-            context.Database.OpenConnection();
+            _dbContext!.Database.OpenConnection();
             _testContext?.WriteLine("DB接続成功しました。");
             Assert.IsTrue(true);
         }
@@ -45,38 +71,31 @@ public class AddDbContextTests
         finally
         {
             // データベース接続を解除する
-            context.Database.CloseConnection();
-            context.Dispose(); // AppDbContxetを破棄する
+            _dbContext!.Database.CloseConnection();
+            _dbContext!.Dispose(); // AppDbContxetを破棄する
         }
     }
 
     [TestMethod("DbSetプロパティにアクセスできる")]
     public void DbSet_Properties_ShouldBeAccessible()
     {
-        var connectionString =
-            "Server=localhost;Port=3306;Database=restapi_exercise;User Id=root;Password=root;";
-        var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 36)))
-            .Options;
-        using var context = new AppDbContext(options);
-
         // DbSetプロパティにアクセスできることを検証する
-        Assert.IsNotNull(context.Products, "Products DbSet にアクセスできません。");
-        Assert.IsNotNull(context.ProductCategories, "ProductCategories DbSet にアクセスできません。");
-        Assert.IsNotNull(context.ProductStocks, "ProductStocks DbSet にアクセスできません。");
+        Assert.IsNotNull(_dbContext!.Products, "Products DbSet にアクセスできません。");
+        Assert.IsNotNull(_dbContext!.ProductCategories, "ProductCategories DbSet にアクセスできません。");
+        Assert.IsNotNull(_dbContext!.ProductStocks, "ProductStocks DbSet にアクセスできません。");
 
         // 型が期待どおりであることを検証する
-        Assert.IsInstanceOfType(context.Products, typeof(DbSet<ProductEntity>));
-        Assert.IsInstanceOfType(context.ProductCategories, typeof(DbSet<ProductCategoryEntity>));
-        Assert.IsInstanceOfType(context.ProductStocks, typeof(DbSet<ProductStockEntity>));
+        Assert.IsInstanceOfType(_dbContext!.Products, typeof(DbSet<ProductEntity>));
+        Assert.IsInstanceOfType(_dbContext!.ProductCategories, typeof(DbSet<ProductCategoryEntity>));
+        Assert.IsInstanceOfType(_dbContext!.ProductStocks, typeof(DbSet<ProductStockEntity>));
 
         // クエリが実行できることを検証する
         // データが空でも例外なくCount()が返ればOKとする
         try
         {
-            var _ = context.Products.Count(); // 例外が出ないことを確認
-            var __ = context.ProductCategories.Count();
-            var ___ = context.ProductStocks.Count();
+            var _ = _dbContext!.Products.Count(); // 例外が出ないことを確認
+            var __ = _dbContext!.ProductCategories.Count();
+            var ___ = _dbContext!.ProductStocks.Count();
             Assert.IsTrue(true);
         }
         catch (Exception ex)

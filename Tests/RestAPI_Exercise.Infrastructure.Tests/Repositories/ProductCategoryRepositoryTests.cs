@@ -1,8 +1,7 @@
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using RestAPI_Exercise.Application.Domains.Repositories;
-using RestAPI_Exercise.Infrastructure.Adapters;
-using RestAPI_Exercise.Infrastructure.Contexts;
-using RestAPI_Exercise.Infrastructure.Repositories;
+using RestAPI_Exercise.Presentation.Configs;
 namespace RestAPI_Exercise.Infrastructure.Tests.Repositories;
 /// <summary>
 ///  ドメインオブジェクト:商品カテゴリのCRUD操作インターフェイスの実装の単体テストドライバ
@@ -14,28 +13,49 @@ public class ProductCategoryRepositoryTests
     private static TestContext? _testContext;
     // テストターゲット
     private static IProductCategoryRepository _productCategoryRepository = null!;
+
+    private static ServiceProvider? _provider;
+    private IServiceScope? _scope;
+
     /// <summary>
-    /// テストクラスの初期化処理
+    /// テストクラスの初期化
     /// </summary>
+    /// <param name="_"></param>
     [ClassInitialize]
-    public static void SetUp(TestContext context)
+    public static void ClassInit(TestContext context)
     {
         // MSTestテスト用ログ出力ハンドルを設定する
         _testContext = context;
-        // AppDbContextの生成
-        var connectionString =
-        "Server=localhost;Port=3306;Database=restapi_exercise;User Id=root;Password=root;";
-        // データベース接続オプションを生成する
-        var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 36)),
-                mySqlOptions => mySqlOptions.EnableRetryOnFailure())
-            .Options;
-        var dbContext = new AppDbContext(options);
-        // ProductCategoryEntityAdapterの生成
-        var adapter = new ProductCategoryEntityAdapter();
-        // テストターゲットを生成する   
-        _productCategoryRepository = new ProductCategoryRepository(dbContext, adapter);
+        var config = new ConfigurationBuilder()
+            .SetBasePath(AppContext.BaseDirectory)
+            .AddJsonFile("appsettings.json", optional: false)
+            .Build();
+        _provider = ApplicationDependencyExtensions.BuildAppProvider(config);
     }
+
+[ClassCleanup]
+    public static void ClassCleanup()
+    {
+        _provider?.Dispose();
+    }   
+
+    /// <summary>
+    /// テストの前処理
+    /// </summary>
+    [TestInitialize]
+    public void TestInit()
+    {
+        _scope = _provider!.CreateScope();
+        _productCategoryRepository =
+        _scope.ServiceProvider.GetRequiredService<IProductCategoryRepository>();  
+    }
+
+    [TestCleanup]
+    public void TestCleanup()
+    {
+        _scope!.Dispose();
+    }
+
 
     [TestMethod("すべての商品カテゴリを取得できる")]
     public async Task SelectAllAsync_ShouldReturnAllCategories()
