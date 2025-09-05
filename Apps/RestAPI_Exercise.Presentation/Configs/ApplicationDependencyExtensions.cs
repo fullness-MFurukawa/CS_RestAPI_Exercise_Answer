@@ -67,6 +67,8 @@ public static class ApplicationDependencyExtensions
     {
         // ユースケース:[新商品を登録する]を実現するインターフェイ
         services.AddScoped<IRegisterProductUsecase, RegisterProductUsecase>();
+        // ユースケース:[商品を変更する]を実現するインターフェイ
+        services.AddScoped<IUpdateProductUsecase, UpdateProductUsecase>();
         return services;
     }
 
