@@ -14,9 +14,12 @@ public class AddDbContextTests
     private static TestContext? _testContext;
     private static ServiceProvider? _provider;
     private IServiceScope? _scope;
-
     private static AppDbContext? _dbContext;
 
+    /// <summary>
+    /// テストクラスの初期化
+    /// </summary>
+    /// <param name="context"></param>
     [ClassInitialize]
     public static void ClassInit(TestContext context)
     {
@@ -28,7 +31,9 @@ public class AddDbContextTests
             .Build();
         _provider = ApplicationDependencyExtensions.BuildAppProvider(config);
     }
-
+    /// <summary>
+    /// テストクラスクリーンアップ
+    /// </summary>
     [ClassCleanup]
     public static void ClassCleanup()
     {
@@ -36,7 +41,7 @@ public class AddDbContextTests
     }
 
     /// <summary>
-    /// テストの前処理
+    /// テストメソッド実行の前処理
     /// </summary>
     [TestInitialize]
     public void TestInit()
@@ -45,7 +50,9 @@ public class AddDbContextTests
         _dbContext =
         _scope.ServiceProvider.GetRequiredService<AppDbContext>();
     }
-
+    /// <summary>
+    /// テストメソッド実行後の後処理
+    /// </summary> 
     [TestCleanup]
     public void TestCleanup()
     {

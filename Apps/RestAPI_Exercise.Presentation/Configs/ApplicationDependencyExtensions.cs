@@ -10,7 +10,8 @@ using RestAPI_Exercise.Application.Usecases.Products.Interactors;
 namespace RestAPI_Exercise.Presentation.Configs;
 /// <summary>
 /// 依存関係(DI)の設定
-/// インフラストラクチャ層、アプリケーション層、プレゼンテーション層をまとめて追加する拡張クラス
+/// インフラストラクチャ層、アプリケーション層、プレゼンテーション層
+/// をまとめて追加する拡張クラス
 /// </summary>
 public static class ApplicationDependencyExtensions
 {
@@ -23,9 +24,11 @@ public static class ApplicationDependencyExtensions
     public static IServiceCollection AddApplicationDependencies(
         this IServiceCollection services, IConfiguration config)
     {
-        // 各層の依存関係を追加
+        // インフラストラクチャ層の依存関係を追加
         services.AddInfrastructureDependencies(config);
+        // アプリケーション層の依存関係を追加
         services.AddApplicationLayerDependencies();
+        // プレゼンテーション層の依存関係を追加
         services.AddPresentationLayerDependencies();
         return services;
     }
