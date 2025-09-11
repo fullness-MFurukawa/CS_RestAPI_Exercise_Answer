@@ -36,7 +36,7 @@ public class ProductStock
     private void ValidateStock(int stock)
     {
         if (stock < 0)
-            throw new DomainException("在庫数は0以上である必要があります");
+            throw new DomainException("在庫数は0以上である必要があります。");
     }
     /// <summary>
     /// UUIDの形式検証
@@ -44,7 +44,7 @@ public class ProductStock
     private void ValidateUuid(string uuid)
     {
         if (!Guid.TryParse(uuid, out _))
-            throw new DomainException("UUIDの形式が正しくありません");
+            throw new DomainException("UUIDの形式が正しくありません。");
     }
 
     /// <summary>

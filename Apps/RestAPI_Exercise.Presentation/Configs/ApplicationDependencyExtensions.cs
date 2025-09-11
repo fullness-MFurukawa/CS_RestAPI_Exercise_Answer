@@ -65,10 +65,12 @@ public static class ApplicationDependencyExtensions
     /// </summary>
     private static IServiceCollection AddApplicationLayerDependencies(this IServiceCollection services)
     {
-        // ユースケース:[新商品を登録する]を実現するインターフェイ
+        // ユースケース:[新商品を登録する]を実現するインターフェイス
         services.AddScoped<IRegisterProductUsecase, RegisterProductUsecase>();
-        // ユースケース:[商品を変更する]を実現するインターフェイ
+        // ユースケース:[商品を変更する]を実現するインターフェイス
         services.AddScoped<IUpdateProductUsecase, UpdateProductUsecase>();
+        // ユースケース:[商品をキーワード検索する]を実現するインターフェイス
+        services.AddScoped<ISearchProductByKeywordUsecase, SearchProductByKeywordUsecase>();
         return services;
     }
 

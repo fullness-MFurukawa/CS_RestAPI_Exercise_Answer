@@ -41,9 +41,9 @@ public class ProductCategory
     private void ValidateName(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw new DomainException("カテゴリ名は必須です");
+            throw new DomainException("カテゴリ名は必須です。");
         if (name.Length > MaxLength)
-            throw new DomainException($"カテゴリ名は{MaxLength}文字以内で入力してください");
+            throw new DomainException($"カテゴリ名は{MaxLength}文字以内である必要があります。");
     }
 
     /// <summary>
@@ -53,7 +53,7 @@ public class ProductCategory
     private void ValidateUuid(string uuid)
     {
         if (!Guid.TryParse(uuid, out _))
-            throw new DomainException("UUIDの形式が正しくありません");
+            throw new DomainException("UUIDの形式が正しくありません。");
     }
 
     /// <summary>
