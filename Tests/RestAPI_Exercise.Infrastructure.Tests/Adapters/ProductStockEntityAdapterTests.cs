@@ -51,7 +51,7 @@ public class ProductStockEntityAdapterTests
     [TestInitialize]
     public void TestInit()
     {
-        // コープドサービスを取得する
+        // スコープドサービスを取得する
         _scope = _provider!.CreateScope();
         // テストターゲットを取得する
         _adapter =
@@ -64,7 +64,7 @@ public class ProductStockEntityAdapterTests
     [TestCleanup]
     public void TestCleanup()
     {
-        // コープドサービスを破棄する
+        // スコープドサービスを破棄する
         _scope!.Dispose();
     }
 

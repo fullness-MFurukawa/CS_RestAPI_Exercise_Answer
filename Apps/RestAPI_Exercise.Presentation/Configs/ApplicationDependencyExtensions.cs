@@ -73,7 +73,10 @@ public static class ApplicationDependencyExtensions
     /// <summary>
     /// アプリケーション層の依存関係を追加
     /// </summary>
-    private static IServiceCollection AddApplicationLayerDependencies(this IServiceCollection services)
+    /// <param name="services">依存関係注入(DI)のサービスコレクション</param>
+    /// <returns></returns>
+    private static IServiceCollection AddApplicationLayerDependencies(
+        this IServiceCollection services)
     {
         // ユースケース:[新商品を登録する]を実現するインターフェイス
         services.AddScoped<IRegisterProductUsecase, RegisterProductUsecase>();
