@@ -9,11 +9,16 @@ namespace RestAPI_Exercise.Infrastructure.Tests.Contexts;
 /// アプリケーション用DbContextの単体テストドライバ
 /// </summary>
 [TestClass]
+[TestCategory("Contexts")]
 public class AddDbContextTests
 {
+    // MSTestテスト用ログ出力ハンドル
     private static TestContext? _testContext;
+    // サービスプロバイダ(DIコンテナ)
     private static ServiceProvider? _provider;
+    // スコープドサービス
     private IServiceScope? _scope;
+    // テストターゲット
     private static AppDbContext? _dbContext;
 
     /// <summary>
@@ -25,10 +30,12 @@ public class AddDbContextTests
     {
         // MSTestテスト用ログ出力ハンドルを設定する
         _testContext = context;
+        // アプリケーション管理を生成
         var config = new ConfigurationBuilder()
             .SetBasePath(AppContext.BaseDirectory)
             .AddJsonFile("appsettings.json", optional: false)
             .Build();
+        // サービスプロバイダ(DIコンテナ)の生成
         _provider = ApplicationDependencyExtensions.BuildAppProvider(config);
     }
     /// <summary>
@@ -37,6 +44,7 @@ public class AddDbContextTests
     [ClassCleanup]
     public static void ClassCleanup()
     {
+        // 生成したサービスプロバイダ(DIコンテナ)を破棄する
         _provider?.Dispose();
     }
 
@@ -46,7 +54,9 @@ public class AddDbContextTests
     [TestInitialize]
     public void TestInit()
     {
+        // コープドサービスを取得する
         _scope = _provider!.CreateScope();
+        // テストターゲットを取得する
         _dbContext =
         _scope.ServiceProvider.GetRequiredService<AppDbContext>();
     }
@@ -56,6 +66,7 @@ public class AddDbContextTests
     [TestCleanup]
     public void TestCleanup()
     {
+        // コープドサービスを破棄する
         _scope!.Dispose();
     }
 

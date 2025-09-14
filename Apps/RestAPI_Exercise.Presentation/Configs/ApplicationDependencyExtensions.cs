@@ -36,14 +36,21 @@ public static class ApplicationDependencyExtensions
     /// <summary>
     /// インフラストラクチャ層の依存関係を追加
     /// </summary>
+    /// <param name="services">依存関係注入(DI)のサービスコレクション</param>
+    /// <param name="config">アプリケーションの設定情報を管理</param>
+    /// <returns></returns>
     private static IServiceCollection AddInfrastructureDependencies(
         this IServiceCollection services, IConfiguration config)
     {
-        // DbContext の登録
+        // MySQLの接続文字列を設定ファイルから取得する
         var connectstr = config.GetConnectionString("MySqlConnection");
+        // AddDbContextをサービスコレクションに登録する
         services.AddDbContext<AppDbContext>(options =>
         {
+            // データベース操作ログをデバッグレベルでコンソールに出力する
             options.LogTo(Console.WriteLine, LogLevel.Debug);
+            // MySQLのデータベースを指定された接続文字列を使用して構成
+            // AutoDetectは接続文字列を基にMySQLのサーバーバージョンを自動的に検出
             options.UseMySql(connectstr, ServerVersion.AutoDetect(connectstr));
         });
         // ドメインオブジェクト:ProductSctockとProductStockEntityの相互変換クラス

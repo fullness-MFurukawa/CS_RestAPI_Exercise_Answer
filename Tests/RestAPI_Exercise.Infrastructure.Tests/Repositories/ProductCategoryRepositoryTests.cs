@@ -10,11 +10,13 @@ namespace RestAPI_Exercise.Infrastructure.Tests.Repositories;
 [TestCategory("Repositories")]
 public class ProductCategoryRepositoryTests
 {
+    // MSTestテスト用ログ出力ハンドル
     private static TestContext? _testContext;
     // テストターゲット
     private static IProductCategoryRepository _productCategoryRepository = null!;
-
+    // サービスプロバイダ(DIコンテナ)
     private static ServiceProvider? _provider;
+    // スコープドサービス
     private IServiceScope? _scope;
 
     /// <summary>
@@ -26,16 +28,22 @@ public class ProductCategoryRepositoryTests
     {
         // MSTestテスト用ログ出力ハンドルを設定する
         _testContext = context;
+        // アプリケーション管理を生成
         var config = new ConfigurationBuilder()
             .SetBasePath(AppContext.BaseDirectory)
             .AddJsonFile("appsettings.json", optional: false)
             .Build();
+        // サービスプロバイダ(DIコンテナ)の生成 
         _provider = ApplicationDependencyExtensions.BuildAppProvider(config);
     }
 
-[ClassCleanup]
+    /// <summary>
+    /// テストクラスクリーンアップ
+    /// </summary>
+    [ClassCleanup]
     public static void ClassCleanup()
     {
+        // 生成したサービスプロバイダ(DIコンテナ)を破棄する
         _provider?.Dispose();
     }   
 
@@ -45,14 +53,20 @@ public class ProductCategoryRepositoryTests
     [TestInitialize]
     public void TestInit()
     {
+        // コープドサービスを取得する
         _scope = _provider!.CreateScope();
+        // テストターゲットを取得する
         _productCategoryRepository =
         _scope.ServiceProvider.GetRequiredService<IProductCategoryRepository>();  
     }
 
+    /// <summary>
+    /// テストメソッド実行後の後処理
+    /// </summary>
     [TestCleanup]
     public void TestCleanup()
     {
+        // コープドサービスを破棄する
         _scope!.Dispose();
     }
 
