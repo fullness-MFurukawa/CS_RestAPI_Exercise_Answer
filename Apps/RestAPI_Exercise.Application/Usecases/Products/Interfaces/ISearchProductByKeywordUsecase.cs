@@ -10,6 +10,5 @@ public interface ISearchProductByKeywordUsecase
     /// </summary>
     /// <param name="keyword">商品キーワード</param>
     /// <returns>キーワード検索結果</returns>
-    /// <exception cref="NotFoundException">該当データが存在しない場合にスローされる</exception>
     Task<List<Product>> ExecuteAsync(string keyword);
 }

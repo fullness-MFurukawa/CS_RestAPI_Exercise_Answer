@@ -2,7 +2,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RestAPI_Exercise.Application.Usecases.Products.Interfaces;
 using RestAPI_Exercise.Presentation.Configs;
-using RestAPI_Exercise.Application.Exceptions;
 namespace RestAPI_Exercise.Application.Tests.Usecase.Products.Interactors;
 /// <summary>
 /// ユースケース:[商品をキーワード検索する]を実現するインターフェイスの実装のテストドライバ
@@ -101,18 +100,14 @@ public class SearchProductByKeywordUsecaseTests
         Assert.AreEqual(100, results[3].Stock!.Stock);
     }
 
-    [TestMethod("存在しない商品キーワードの場合、NotFoundExceptionがスローされる")]
+    [TestMethod("存在しない商品キーワードの場合、空のリストが返される")]
     public async Task ExecuteAsync_ShouldThrowNotFoundException_WhenKeywordDoesNotExist()
     {
-        var ex = await Assert.ThrowsExceptionAsync<NotFoundException>(async () =>
-        {
-            // 商品を変更する
-            await _usecase!.ExecuteAsync("ゴム");
-        });
+        var result = await _usecase!.ExecuteAsync("ゴム");
         // nullでないことを検証する
-        Assert.IsNotNull(ex);
-        // 例外メッセージを検証する
-        Assert.AreEqual("キーワード:ゴムが含まれる商品は存在しません。", ex.Message);
+        Assert.IsNotNull(result);
+        // 件数が0件であることを検証する
+        Assert.AreEqual(0, result.Count);
     }
 
 }

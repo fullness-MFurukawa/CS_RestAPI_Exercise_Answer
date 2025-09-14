@@ -23,14 +23,9 @@ public class SearchProductByKeywordUsecase : ISearchProductByKeywordUsecase
     /// </summary>
     /// <param name="keyword">商品キーワード</param>
     /// <returns>キーワード検索結果</returns>
-    /// <exception cref="NotFoundException">該当データが存在しない場合にスローされる</exception>
     public async Task<List<Product>> ExecuteAsync(string keyword)
     {
         var result = await _repository.SelectByNameLikeWithProductStockAsync(keyword);
-        if (result.Count() == 0)
-        {
-            throw new NotFoundException($"キーワード:{keyword}が含まれる商品は存在しません。");
-        }
         return result;
     }
 }

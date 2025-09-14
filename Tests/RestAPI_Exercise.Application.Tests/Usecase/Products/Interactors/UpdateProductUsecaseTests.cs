@@ -13,8 +13,11 @@ namespace RestAPI_Exercise.Application.Tests.Usecase.Products.Interactors;
 [TestCategory("Usecase/Products/Interactor")]
 public class UpdateProductUsecaseTests
 {
+    // MSTestテスト用ログ出力ハンドル
     private static TestContext? _testContext;
+    // サービスプロバイダ(DIコンテナ)
     private static ServiceProvider? _provider;
+    // スコープドサービス
     private IServiceScope? _scope;
     // テストターゲット
     private static IUpdateProductUsecase? _usecase;
@@ -30,16 +33,21 @@ public class UpdateProductUsecaseTests
     {
         // MSTestテスト用ログ出力ハンドルを設定する
         _testContext = context;
+        // アプリケーション管理を生成
         var config = new ConfigurationBuilder()
             .SetBasePath(AppContext.BaseDirectory)
-            .AddJsonFile("appsettings.json", optional: false)
-            .Build();
+            .AddJsonFile("appsettings.json", optional: false).Build();
+        // サービスプロバイダ(DIコンテナ)の生成
         _provider = ApplicationDependencyExtensions.BuildAppProvider(config);
     }
 
+    /// <summary>
+    /// テストクラスクリーンアップ
+    /// </summary>
     [ClassCleanup]
     public static void ClassCleanup()
     {
+        // 生成したサービスプロバイダ(DIコンテナ)を破棄する
         _provider?.Dispose();
     }
 
@@ -49,16 +57,23 @@ public class UpdateProductUsecaseTests
     [TestInitialize]
     public void TestInit()
     {
+        // スコープドサービスを取得する
         _scope = _provider!.CreateScope();
+        // テストターゲットを取得する
         _usecase =
         _scope.ServiceProvider.GetRequiredService<IUpdateProductUsecase>();
+        // 商品リポジトリを取得する
         _repository =
         _scope.ServiceProvider.GetRequiredService<IProductRepository>();
     }
 
+    /// <summary>
+    /// テストメソッド実行後の後処理
+    /// </summary> 
     [TestCleanup]
     public void TestCleanup()
     {
+        // スコープドサービスを破棄する
         _scope!.Dispose();
     }
 

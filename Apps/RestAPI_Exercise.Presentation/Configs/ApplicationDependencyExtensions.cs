@@ -90,8 +90,12 @@ public static class ApplicationDependencyExtensions
     /// <summary>
     /// プレゼンテーション層の依存関係を追加
     /// </summary>
+    /// <param name="services">依存関係注入(DI)のサービスコレクション</param>
+    /// <returns></returns>
     private static IServiceCollection AddPresentationLayerDependencies(this IServiceCollection services)
     {
+        // コントローラをサービスコレクションに登録する
+        services.AddControllers();
         return services;
     }
 
