@@ -1,0 +1,187 @@
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using RestAPI_Exercise.Application.Domains.Models;
+using RestAPI_Exercise.Application.Usecases.Products.Interfaces;
+using RestAPI_Exercise.Presentation.Adapters;
+using RestAPI_Exercise.Presentation.Configs;
+using RestAPI_Exercise.Presentation.Controllers;
+namespace RestAPI_Exercise.Presentation.Tests.Controllers;
+/// <summary>
+/// ユースケース:[新商品を登録する]を実現するコントローラのテストドライバ
+/// </summary>
+[TestClass]
+[TestCategory("Controllers")]
+public class RegisterProductControllerTests
+{
+    // MSTestテスト用ログ出力ハンドル
+    private static TestContext? _testContext;
+    // サービスプロバイダ(DIコンテナ)
+    private static ServiceProvider? _provider;
+    // スコープドサービス
+    private IServiceScope? _scope;
+    // ユースケース:[新商品を登録する]を実現するインターフェイス
+    private IRegisterProductUsecase? _usecase;
+    // RegisterProductViewModelからドメインオブジェクト:Productへ変換するアダプタ
+    private RegisterProductViewModelAdapter? _adapter;
+    // テストターゲット
+    private RegisterProductController? _controller;
+
+    /// <summary>
+    /// テストクラスの初期化
+    /// </summary>
+    /// <param name="_"></param>
+    [ClassInitialize]
+    public static void ClassInit(TestContext context)
+    {
+        // MSTestテスト用ログ出力ハンドルを設定する
+        _testContext = context;
+        // アプリケーション管理を生成
+        var config = new ConfigurationBuilder()
+            .SetBasePath(AppContext.BaseDirectory)
+            .AddJsonFile("appsettings.json", optional: false).Build();
+        // サービスプロバイダ(DIコンテナ)の生成
+        _provider = ApplicationDependencyExtensions.BuildAppProvider(config);
+    }
+
+    /// <summary>
+    /// テストクラスクリーンアップ
+    /// </summary>
+    [ClassCleanup]
+    public static void ClassCleanup()
+    {
+        // 生成したサービスプロバイダ(DIコンテナ)を破棄する
+        _provider?.Dispose();
+    }
+
+    [TestInitialize]
+    public void TestInit()
+    {
+        // スコープドサービスを取得する
+        _scope = _provider!.CreateScope();
+        // [新商品を登録する]を実現インターフェイスを取得する
+        _usecase = _scope.ServiceProvider.GetRequiredService<IRegisterProductUsecase>();
+        // RegisterProductViewModelからドメインオブジェクト:Productへ変換するアダプタを取得する
+        _adapter = _scope.ServiceProvider.GetRequiredService<RegisterProductViewModelAdapter>();
+        // テストターゲットを生成する
+        _controller = new RegisterProductController(_usecase, _adapter);
+    }
+
+    /// <summary>
+    /// テストメソッド実行後の後処理
+    /// </summary> 
+    [TestCleanup]
+    public void TestCleanup()
+    {
+        // スコープドサービスを破棄する
+        _scope!.Dispose();
+    }
+
+    [TestMethod("商品カテゴリ一覧の取得:OK(200)とList<ProductCategory>を返す")]
+    public async Task GetCategories_ShouldReturnOk()
+    {
+        var result = await _controller!.GetCategories();
+        // IActionResultをOkObjectResultに変換する
+        var ok = result as OkObjectResult;
+        // nullでないことを検証する
+        Assert.IsNotNull(ok);
+        // ステータスOK(200)であることを検証する
+        Assert.AreEqual(StatusCodes.Status200OK, ok!.StatusCode);
+        // レスポンスボディを取得する
+        var categories = ok.Value as List<ProductCategory>;
+        // nullでないことを検証する
+        Assert.IsNotNull(categories);
+        // 3件であることを検証する
+        Assert.AreEqual(3, categories.Count);
+        foreach (var category in categories)
+        {
+            _testContext!.WriteLine(category.ToString());
+        }
+    }
+
+    [TestMethod("Idに一致する商品カテゴリの取得:存在する商品カテゴリIdの場合、Ok(200)と該当する商品カテゴリを返す")]
+    public async Task GetCategoryById_ShouldWork_ForFound()
+    {
+        var response = await _controller!
+            .GetCategoryById("2f5016b6-6f6b-11f0-954a-00155d1bd29a");
+        // レスポンスがOkObjectResultであることを検証する
+        Assert.IsInstanceOfType(response, typeof(OkObjectResult));
+        // レスポンスをOkObjectResultに変換する
+        var okObj = response as OkObjectResult;
+        // レスポンスボディを取得する
+        var category = okObj!.Value as ProductCategory;
+        // nullでないことを検証する
+        Assert.IsNotNull(category);
+        // 商品カテゴリIdを検証する
+        Assert.AreEqual("2f5016b6-6f6b-11f0-954a-00155d1bd29a", category!.CategoryUuid);
+        Assert.AreEqual("雑貨", category!.Name);
+    }
+
+    [TestMethod("Idに一致する商品カテゴリの取得:存在しない商品カテゴリIdの場合、NotFiund(404)とエラーを返す")]
+    public async Task GetCategoryById_ShouldWork_ForNotFound()
+    {
+        var response = await _controller!
+            .GetCategoryById("2f5016b6-6f6b-11f0-954a-00155d1bd10a");
+        // レスポンスをNotFoundObjectResultに変換する
+        var notfound = response as NotFoundObjectResult;
+        // nullでないことを検証する
+        Assert.IsNotNull(notfound);
+        // レスポンスボディを取得する
+        var val = notfound!.Value!;
+        var code = val.GetType().GetProperty("code")?.GetValue(val) as string;
+        var msg = val.GetType().GetProperty("message")?.GetValue(val) as string;
+        // エラーコードを検証する
+        Assert.AreEqual("CATEGORY_NOT_FOUND", code);
+        // エラーメッセージを検証する
+        Assert.AreEqual("商品カテゴリId:2f5016b6-6f6b-11f0-954a-00155d1bd10aの商品カテゴリは存在しません。"
+            , msg);
+    }
+
+    [TestMethod("商品名有無チェック:商品名が未入力の場合、BadRequest(400)とエラーが返される")]
+    public async Task ValidateProduct_ShouldReturnBadRequest_WhenNameEmpty()
+    {
+        var response = await _controller!.ValidateProduct("  ");
+        // レスポンスをBadRequestObjectResultに変換する
+        var bad = response as BadRequestObjectResult;
+        // nullでないことを検証する
+        Assert.IsNotNull(bad);
+        // レスポンスボディを取得する
+        var val = bad!.Value!;
+        var code = val.GetType().GetProperty("code")?.GetValue(val) as string;
+        var msg = val.GetType().GetProperty("message")?.GetValue(val) as string;
+        Assert.AreEqual("INVALID_PRODUCT_NAME", code);
+        Assert.AreEqual("商品名は必須です。", msg);
+    }
+
+    [TestMethod("商品名有無チェック:存在する商品名の場合、Conflict(409)とエラーが返される")]
+    public async Task ValidateProduct_ShouldReturnConflict_WhenExists()
+    {
+        var response = await _controller!.ValidateProduct("水性ボールペン(赤)");
+        // レスポンスをConflictObjectResultに変換する
+        var conflict = response as ConflictObjectResult;
+        // レスポンスボディを取得する
+        var val = conflict!.Value!;
+        var code = val.GetType().GetProperty("code")?.GetValue(val) as string;
+        var msg = val.GetType().GetProperty("message")?.GetValue(val) as string;
+        Assert.AreEqual("PRODUCT_ALREADY_EXISTS", code);
+        Assert.AreEqual("商品名:水性ボールペン(赤)は既に存在します。", msg);
+    }
+
+    [TestMethod("商品名有無チェック:存在しない商品名の場合、OK(200)とfalseが返される")]
+    public async Task ValidateProduct_ShouldReturnOk_WhenNotExists()
+    {
+        var response = await _controller!.ValidateProduct("消しゴム");
+        var ok = response as OkObjectResult;
+        // nullでないことを検証する
+        Assert.IsNotNull(ok);
+        // レスポンスボディを取得する
+        var val = ok!.Value!;
+        var prop = val.GetType().GetProperty("exists");
+        // nullでないことを検証する
+        Assert.IsNotNull(prop);
+        var exists = (bool)(prop!.GetValue(val)!);
+        // falseであることを検証する
+        Assert.IsFalse(exists); 
+    }
+}
