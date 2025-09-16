@@ -136,7 +136,7 @@ public class RegisterProductController : ControllerBase
             var product = await _adapter.RestoreAsync(model);
             // 商品を永続化する
             await _usecase.RegisterProductAsync(product);
-            return Created($"/api/products/{product.ProductUuid}", product.Name);
+            return Created($"/api/products/{product.ProductUuid}", product.ProductUuid);
         }
         catch (ExistsException ex)
         {

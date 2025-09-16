@@ -3,10 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RestAPI_Exercise.Application.Domains.Models;
+using RestAPI_Exercise.Application.Domains.Repositories;
 using RestAPI_Exercise.Application.Usecases.Products.Interfaces;
 using RestAPI_Exercise.Presentation.Adapters;
 using RestAPI_Exercise.Presentation.Configs;
 using RestAPI_Exercise.Presentation.Controllers;
+using RestAPI_Exercise.Presentation.ViewModels;
 namespace RestAPI_Exercise.Presentation.Tests.Controllers;
 /// <summary>
 /// ユースケース:[新商品を登録する]を実現するコントローラのテストドライバ
@@ -27,6 +29,8 @@ public class RegisterProductControllerTests
     private RegisterProductViewModelAdapter? _adapter;
     // テストターゲット
     private RegisterProductController? _controller;
+    // ProductRepository
+    private IProductRepository? _repository;
 
     /// <summary>
     /// テストクラスの初期化
@@ -66,6 +70,8 @@ public class RegisterProductControllerTests
         _adapter = _scope.ServiceProvider.GetRequiredService<RegisterProductViewModelAdapter>();
         // テストターゲットを生成する
         _controller = new RegisterProductController(_usecase, _adapter);
+        // ProductRepositoryを取得する
+        _repository = _scope.ServiceProvider.GetRequiredService<IProductRepository>();
     }
 
     /// <summary>
@@ -100,7 +106,7 @@ public class RegisterProductControllerTests
         }
     }
 
-    [TestMethod("Idに一致する商品カテゴリの取得:存在する商品カテゴリIdの場合、Ok(200)と該当する商品カテゴリを返す")]
+    [TestMethod("Idに一致する商品カテゴリの取得:存在する商品カテゴリIdの場合、Ok(200)と該当する商品カテゴリが返される   ")]
     public async Task GetCategoryById_ShouldWork_ForFound()
     {
         var response = await _controller!
@@ -118,7 +124,7 @@ public class RegisterProductControllerTests
         Assert.AreEqual("雑貨", category!.Name);
     }
 
-    [TestMethod("Idに一致する商品カテゴリの取得:存在しない商品カテゴリIdの場合、NotFiund(404)とエラーを返す")]
+    [TestMethod("Idに一致する商品カテゴリの取得:存在しない商品カテゴリIdの場合、NotFiund(404)とエラーが返される")]
     public async Task GetCategoryById_ShouldWork_ForNotFound()
     {
         var response = await _controller!
@@ -182,6 +188,105 @@ public class RegisterProductControllerTests
         Assert.IsNotNull(prop);
         var exists = (bool)(prop!.GetValue(val)!);
         // falseであることを検証する
-        Assert.IsFalse(exists); 
+        Assert.IsFalse(exists);
+    }
+
+    [TestMethod("商品登録:バリデーションエラーの場合、BadRequest(400)とエラーが返される")]
+    public async Task Register_ShouldReturnBadRequest_WhenModelInvalid()
+    {
+        // 自動バリデーション機能が利用できないので、予めエラーメッセージを設定する
+        _controller!.ModelState.AddModelError("Name", "商品名は必須です。");
+        var viewModel = new RegisterProductViewModel
+        {
+            Name = "",
+            Price = 100,
+            Stock = 10,
+            CategoryId = "2f4d3e51-6f6b-11f0-954a-00155d1bd29a",
+            CategoryName = "文房具"
+        };
+        // 商品登録を実行する
+        var response = await _controller.Register(viewModel);
+        // レスポンスをBadRequestObjectResultに変換する
+        var bad = response as BadRequestObjectResult;
+        // nullでないことを検証する
+        Assert.IsNotNull(bad);
+        // レスポンスボディを取得する
+        var val = bad!.Value!;
+        var code = val.GetType().GetProperty("code")?.GetValue(val) as string;
+        var detailsObj = val.GetType().GetProperty("details")!.GetValue(val)!;
+        var details = detailsObj as Dictionary<string, string[]>;
+        // メッセージがnullでないことを検証する
+        Assert.IsNotNull(details);
+        // Nameプロパティの値がエラーであることを検証する
+        Assert.IsTrue(details!.ContainsKey("Name"));
+        // エラーメッセージを検証する
+        CollectionAssert.Contains(details["Name"], "商品名は必須です。");
+    }
+
+    [TestMethod("商品登録:既に存在する商品名の場合、Conflict(Conflict)とエラーが返される")]
+    public async Task Register_ShouldReturnConflict_WhenAlreadyExists()
+    {
+        var viewModel = new RegisterProductViewModel
+        {
+            Name = "水性ボールペン(赤)",
+            Price = 100,
+            Stock = 10,
+            CategoryId = "2f4d3e51-6f6b-11f0-954a-00155d1bd29a",
+            CategoryName = "文房具"
+        };
+        var response = await _controller!.Register(viewModel);
+        // レスポンスをConflictObjectResultに変換する
+        var conflict = response as ConflictObjectResult;
+        // レスポンスボディを取得する
+        var val = conflict!.Value!;
+        var code = val.GetType().GetProperty("code")?.GetValue(val) as string;
+        var msg = val.GetType().GetProperty("message")?.GetValue(val) as string;
+        Assert.AreEqual("PRODUCT_ALREADY_EXISTS", code);
+        Assert.AreEqual("商品名:水性ボールペン(赤)は既に存在します。", msg);
+    }
+
+    [TestMethod("商品登録:商品カテゴリが存在しない場合、NotFound(404)とエラーが返される")]
+    public async Task Register_ShouldReturnNotFound_WhenCategoryMissing()
+    {
+        var viewModel = new RegisterProductViewModel
+        {
+            Name = "水性ボールペン(赤)",
+            Price = 100,
+            Stock = 10,
+            CategoryId = Guid.NewGuid().ToString(), // 存在しない商品カテゴリId
+            CategoryName = "ダミー"
+        };
+        var res = await _controller!.Register(viewModel);
+        var notfound = res as NotFoundObjectResult;
+        Assert.IsNotNull(notfound);
+        // レスポンスボディを取得する
+        var val = notfound!.Value!;
+        var code = val.GetType().GetProperty("code")?.GetValue(val) as string;
+        var msg = val.GetType().GetProperty("message")?.GetValue(val) as string;
+        Assert.AreEqual("CATEGORY_NOT_FOUND", code);
+        Assert.AreEqual($"商品カテゴリId:{viewModel.CategoryId}の商品カテゴリは存在しません。"
+            , msg);
+    }
+
+    [TestMethod("商品登録:矛盾の無いデータの場合、Created(201)とLocationが返される")]
+    public async Task Register_ShouldReturnCreated_WhenSuccess()
+    {
+        var viewModel = new RegisterProductViewModel
+        {
+            Name = "消しゴム",
+            Price = 120,
+            Stock = 10,
+            CategoryId = "2f4d3e51-6f6b-11f0-954a-00155d1bd29a",
+            CategoryName = "文房具"
+        };
+        var response = await _controller!.Register(viewModel);
+        var created = response as CreatedResult;
+        // nullでないことを検証する
+        Assert.IsNotNull(created);
+        // ステータスがCreated(201)であることを検証する
+        Assert.AreEqual(StatusCodes.Status201Created, created!.StatusCode);
+        // 登録されたデータを削除する
+        var id = created.Value?.ToString();
+        await _repository!.DeleteByIdAsync(id!);
     }
 }
