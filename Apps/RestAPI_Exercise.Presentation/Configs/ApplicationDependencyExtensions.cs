@@ -99,6 +99,8 @@ public static class ApplicationDependencyExtensions
         services.AddControllers();
         // RegisterProductViewModelからドメインオブジェクト:Productへ変換するアダプタ
         services.AddScoped<RegisterProductViewModelAdapter>();
+        // UpdateProductViewModelからドメインオブジェクト:Productへ変換するアダプタ
+        services.AddScoped<UpdateProductViewModelAdapter>();
         return services;
     }
 

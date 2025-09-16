@@ -23,6 +23,22 @@ public class UpdateProductUsecase : IUpdateProductUsecase
     }
 
     /// <summary>
+    /// 指定ざれた商品の存在有無を調べる
+    /// </summary>
+    /// <param name="productName">商品目</param>
+    /// <returns>なし</returns>
+    /// <exception cref="ExistsException">同一商品名が存在する場合にスローされる</exception>
+    public async Task ExistsByProductNameAsync(string productName)
+    {
+        // 指定された商品の有無を調べる
+        var result = await _productRepository.ExistsByNameAsync(productName);
+        if (result) // 商品が既に存在する
+        {
+            throw new ExistsException($"商品名:{productName}は既に存在します。");
+        }
+    }
+
+    /// <summary>
     /// 指定された商品Idの商品を取得する
     /// クライアント側の[入力画面]で利用するため
     /// </summary>

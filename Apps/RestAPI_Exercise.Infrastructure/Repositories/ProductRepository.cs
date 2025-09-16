@@ -107,6 +107,7 @@ public class ProductRepository : IProductRepository
             var entities = await _context.Products
                 .AsNoTracking()
                 .Include(p => p.ProductStock)
+                .Include(p => p.ProductCategory)
                 .Where(p => EF.Functions.Like(p.Name, $"%{keyword}%"))
                 .ToListAsync();
             // List<ProductEntity>からList<Product>を復元する

@@ -59,6 +59,9 @@ public class RegisterProductControllerTests
         _provider?.Dispose();
     }
 
+    /// <summary>
+    /// テストメソッド実行の前処理
+    /// </summary>
     [TestInitialize]
     public void TestInit()
     {
