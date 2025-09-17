@@ -99,7 +99,7 @@ public class ProductRepository : IProductRepository
     /// </summary>
     /// <param name="keyword">検索キーワード</param>
     /// <returns>Prodyctのリスト</returns>
-    public async Task<List<Product>> SelectByNameLikeWithProductStockAsync(string keyword)
+    public async Task<List<Product>> SelectByNameLikeWithProductStockAndProductCategoryAsync(string keyword)
     {
         try
         {

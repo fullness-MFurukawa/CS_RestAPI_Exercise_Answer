@@ -90,7 +90,7 @@ public class ProductRepositoryTests
         // 商品名を検証する
         Assert.AreEqual("水性ボールペン(赤)", product.Name);
         // 単価を検証する
-        Assert.AreEqual(120, product.Price);
+        Assert.AreEqual(100, product.Price);
         // 商品在庫がnullでないことを検証する
         Assert.IsNotNull(product.Stock);
         // 商品在庫Idを検証する
@@ -176,9 +176,10 @@ public class ProductRepositoryTests
     }
 
     [TestMethod("存在する商品のキーワードを指定すると、該当する商品のリストが返される")]
-    public async Task SelectByNameLikeWithProductStockAsync_WithExistingKeyword_ShouldReturnMatchingProducts()
+    public async Task SelectByNameLikeWithProductStockAndProductCategoryAsync_WithExistingKeyword_ShouldReturnMatchingProducts()
     {
-        var products = await _productRepository.SelectByNameLikeWithProductStockAsync("蛍光ペン");
+        var products = await _productRepository
+            .SelectByNameLikeWithProductStockAndProductCategoryAsync("蛍光ペン");
         // nullでないことを検証する
         Assert.IsNotNull(products);
         // 件数が4件であることを検証する
@@ -193,6 +194,11 @@ public class ProductRepositoryTests
         Assert.AreEqual("828fc727-6f6b-11f0-954a-00155d1bd29a", products[0].Stock!.StockUuid);
         // 商品在庫数を検証する
         Assert.AreEqual(100, products[0].Stock!.Stock);
+        // 商品カテゴリIdを検証する
+        Assert.AreEqual("2f4d3e51-6f6b-11f0-954a-00155d1bd29a", products[0].Category!.CategoryUuid);
+        // 商品カテゴリ名を検証する
+        Assert.AreEqual("文房具", products[0].Category!.Name);
+
 
         // 商品Idを検証する
         Assert.AreEqual("83fbc81d-2498-4da6-b8c2-54878d3b67ff", products[1].ProductUuid);
@@ -204,6 +210,10 @@ public class ProductRepositoryTests
         Assert.AreEqual("828fc78f-6f6b-11f0-954a-00155d1bd29a", products[1].Stock!.StockUuid);
         // 商品在庫数を検証する
         Assert.AreEqual(100, products[1].Stock!.Stock);
+        // 商品カテゴリIdを検証する
+        Assert.AreEqual("2f4d3e51-6f6b-11f0-954a-00155d1bd29a", products[1].Category!.CategoryUuid);
+        // 商品カテゴリ名を検証する
+        Assert.AreEqual("文房具", products[1].Category!.Name);
 
         // 商品Idを検証する
         Assert.AreEqual("ee4b3752-3fbd-45fc-afb5-8f37c3f701c9", products[2].ProductUuid);
@@ -215,6 +225,10 @@ public class ProductRepositoryTests
         Assert.AreEqual("828fc805-6f6b-11f0-954a-00155d1bd29a", products[2].Stock!.StockUuid);
         // 商品在庫数を検証する
         Assert.AreEqual(100, products[2].Stock!.Stock);
+        // 商品カテゴリIdを検証する
+        Assert.AreEqual("2f4d3e51-6f6b-11f0-954a-00155d1bd29a", products[2].Category!.CategoryUuid);
+        // 商品カテゴリ名を検証する
+        Assert.AreEqual("文房具", products[2].Category!.Name);
 
         // 商品Idを検証する
         Assert.AreEqual("35cb51a7-df79-4771-9939-7f32c19bca45", products[3].ProductUuid);
@@ -226,12 +240,17 @@ public class ProductRepositoryTests
         Assert.AreEqual("828fc869-6f6b-11f0-954a-00155d1bd29a", products[3].Stock!.StockUuid);
         // 商品在庫数を検証する
         Assert.AreEqual(100, products[3].Stock!.Stock);
+        // 商品カテゴリIdを検証する
+        Assert.AreEqual("2f4d3e51-6f6b-11f0-954a-00155d1bd29a", products[3].Category!.CategoryUuid);
+        // 商品カテゴリ名を検証する
+        Assert.AreEqual("文房具", products[3].Category!.Name);
     }
 
     [TestMethod("存在しない商品のキーワードを指定すると、空の商品のリストが返される")]
-    public async Task SelectByNameLikeWithProductStockAsync_WithNonExistingKeyword_ShouldReturnEmptyList()
+    public async Task SelectByNameLikeWithProductStockAndProductCategoryAsync_WithNonExistingKeyword_ShouldReturnEmptyList()
     {
-        var products = await _productRepository.SelectByNameLikeWithProductStockAsync("商品-X");
+        var products = await _productRepository
+            .SelectByNameLikeWithProductStockAndProductCategoryAsync("商品-X");
         // nullでないことを検証する
         Assert.IsNotNull(products);
         // 件数が0であることを検証する

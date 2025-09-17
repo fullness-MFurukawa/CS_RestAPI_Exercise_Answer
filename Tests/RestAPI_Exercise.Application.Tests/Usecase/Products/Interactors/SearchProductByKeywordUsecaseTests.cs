@@ -71,6 +71,10 @@ public class SearchProductByKeywordUsecaseTests
         Assert.AreEqual(130, results[0].Price);
         // 在庫数を検証する
         Assert.AreEqual(100, results[0].Stock!.Stock);
+        // 商品カテゴリIdを検証する
+        Assert.AreEqual("2f4d3e51-6f6b-11f0-954a-00155d1bd29a", results[0].Category!.CategoryUuid);
+        // 商品カテゴリ名を検証する
+        Assert.AreEqual("文房具", results[0].Category!.Name);
 
         // 商品Idを検証する
         Assert.AreEqual("83fbc81d-2498-4da6-b8c2-54878d3b67ff", results[1].ProductUuid);
@@ -80,6 +84,10 @@ public class SearchProductByKeywordUsecaseTests
         Assert.AreEqual(130, results[1].Price);
         // 在庫数を検証する
         Assert.AreEqual(100, results[1].Stock!.Stock);
+        // 商品カテゴリIdを検証する
+        Assert.AreEqual("2f4d3e51-6f6b-11f0-954a-00155d1bd29a", results[1].Category!.CategoryUuid);
+        // 商品カテゴリ名を検証する
+        Assert.AreEqual("文房具", results[1].Category!.Name);
 
         // 商品Idを検証する
         Assert.AreEqual("ee4b3752-3fbd-45fc-afb5-8f37c3f701c9", results[2].ProductUuid);
@@ -89,6 +97,10 @@ public class SearchProductByKeywordUsecaseTests
         Assert.AreEqual(130, results[2].Price);
         // 在庫数を検証する
         Assert.AreEqual(100, results[2].Stock!.Stock);
+        // 商品カテゴリIdを検証する
+        Assert.AreEqual("2f4d3e51-6f6b-11f0-954a-00155d1bd29a", results[2].Category!.CategoryUuid);
+        // 商品カテゴリ名を検証する
+        Assert.AreEqual("文房具", results[2].Category!.Name);
 
         // 商品Idを検証する
         Assert.AreEqual("35cb51a7-df79-4771-9939-7f32c19bca45", results[3].ProductUuid);
@@ -98,6 +110,10 @@ public class SearchProductByKeywordUsecaseTests
         Assert.AreEqual(130, results[3].Price);
         // 在庫数を検証する
         Assert.AreEqual(100, results[3].Stock!.Stock);
+        // 商品カテゴリIdを検証する
+        Assert.AreEqual("2f4d3e51-6f6b-11f0-954a-00155d1bd29a", results[3].Category!.CategoryUuid);
+        // 商品カテゴリ名を検証する
+        Assert.AreEqual("文房具", results[3].Category!.Name);
     }
 
     [TestMethod("存在しない商品キーワードの場合、空のリストが返される")]

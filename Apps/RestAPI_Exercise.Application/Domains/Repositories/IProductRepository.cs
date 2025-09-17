@@ -27,11 +27,11 @@ public interface IProductRepository
     Task<Product?> SelectByIdWithProductStockAndProductCategoryAsync(string id);
 
     /// <summary>
-    /// 指定されたキーワードで商品を部分一致検索して商品と在庫を取得する
+    /// 指定されたキーワードで商品を部分一致検索して商品と在庫、商品カテゴリを取得する
     /// </summary>
     /// <param name="keyword">検索キーワード</param>
     /// <returns>Prodyctのリスト</returns>
-    Task<List<Product>> SelectByNameLikeWithProductStockAsync(string keyword);
+    Task<List<Product>> SelectByNameLikeWithProductStockAndProductCategoryAsync(string keyword);
 
     /// <summary>
     /// 商品を削除する

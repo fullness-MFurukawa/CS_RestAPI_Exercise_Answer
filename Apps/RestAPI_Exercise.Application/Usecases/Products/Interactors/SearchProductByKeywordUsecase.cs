@@ -25,7 +25,8 @@ public class SearchProductByKeywordUsecase : ISearchProductByKeywordUsecase
     /// <returns>キーワード検索結果</returns>
     public async Task<List<Product>> ExecuteAsync(string keyword)
     {
-        var result = await _repository.SelectByNameLikeWithProductStockAsync(keyword);
+        var result = await _repository
+            .SelectByNameLikeWithProductStockAndProductCategoryAsync(keyword);
         return result;
     }
 }
