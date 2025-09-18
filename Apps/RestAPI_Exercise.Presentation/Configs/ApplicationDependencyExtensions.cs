@@ -68,6 +68,11 @@ public static class ApplicationDependencyExtensions
         services.AddScoped<IProductRepository, ProductRepository>();
         // Unit of Workパターンを利用したトランザクション制御インターフェイス
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+        // ドメインオブジェクト:UserとUserEntityの相互変換クラス
+        services.AddScoped<UserEntityAdapter>();
+        // ドメインオブジェクト:User(ユーザー)のCRUD操作インターフェイスの実装
+        services.AddScoped<IUserRepository, UserRepository>();
         return services;
     }
 

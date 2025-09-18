@@ -23,11 +23,14 @@ public interface IUserRepository
     /// <summary>
     /// メールアドレスからユーザーを取得する(ログイン用)
     /// </summary>
+    /// <param name="email">メールアドレス</param>
+    /// <returns>存在する場合:ドメインオブジェクト:User 存在しない場合:null</returns>
     Task<User?> SelectByEmailAsync(string email);
 
     /// <summary>
     /// ユーザーId(UUID)からユーザーを取得する
     /// </summary>
+    /// <param name="useruuid">ユーザーId(UUID)</param>
     /// <returns>存在する場合:ドメインオブジェクト:User 存在しない場合:null</returns>
     Task<User?> SelectByIdAsync(string useruuid);
 
@@ -36,5 +39,5 @@ public interface IUserRepository
     /// </summary>
     /// <param name="usernameOrEmail">ユーザー名またはメールアドレス</param>
     /// <returns>存在する場合:ドメインオブジェクト:User 存在しない場合:null</returns>
-    Task<User?> FindByUsernameOrEmailAsync(string usernameOrEmail);
+    Task<User?> SelectByUsernameOrEmailAsync(string usernameOrEmail);
 }

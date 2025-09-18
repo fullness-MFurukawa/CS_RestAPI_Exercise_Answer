@@ -29,6 +29,11 @@ public class AppDbContext : DbContext
     /// </summary>
     public DbSet<ProductStockEntity> ProductStocks => Set<ProductStockEntity>();
 
+    /// <summary>
+    /// ユーザーテーブル
+    /// </summary>
+    public DbSet<UserEntity> Users => Set<UserEntity>();
+
     // TODO: Fluent API でマッピングを定義する
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -68,5 +73,20 @@ public class AppDbContext : DbContext
             // 商品Id(UUID)はユニーク
             e.HasIndex(s => s.ProductId).IsUnique();
         });
+
+        // ユーザーエンティティの制約（ユニークインデックスなど）を定義可能
+        modelBuilder.Entity<UserEntity>()
+            .Property(u => u.UserUuid)
+            .HasColumnType("char(36)");
+        modelBuilder.Entity<UserEntity>()
+            .HasIndex(u => u.UserUuid)
+            .IsUnique();
+        modelBuilder.Entity<UserEntity>()
+            .HasIndex(u => u.Username)
+            .IsUnique();
+        modelBuilder.Entity<UserEntity>()
+            .HasIndex(u => u.Email)
+            .IsUnique();
+
     }
 }

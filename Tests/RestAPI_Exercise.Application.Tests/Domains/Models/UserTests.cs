@@ -106,4 +106,71 @@ public class UserTests
         });
         Assert.AreEqual("パスワードハッシュは必須です。", ex.Message);
     }
+
+    [TestMethod("有効なユーザー名に変更できる")]
+    public void ChangeUsername_WithValidValue_ShouldSucceed()
+    {
+        var user = new User(ValidUsername, ValidEmail, ValidPasswordHash);
+        user.ChangeUsername("Jiro");
+        Assert.AreEqual("Jiro", user.Username);
+    }
+
+    [TestMethod("不正なユーザー名に変更すると、DomainExceptionがスローされる")]
+    public void ChangeUsername_WithInvalidValue_ShouldThrow()
+    {
+        var user = new User(ValidUsername, ValidEmail, ValidPasswordHash);
+        var ex = Assert.ThrowsException<DomainException>(() => user.ChangeUsername(""));
+        Assert.AreEqual("ユーザー名は必須です。", ex.Message);
+    }
+
+    [TestMethod("有効なメールアドレスに変更できる")]
+    public void ChangeEmail_WithValidValue_ShouldSucceed()
+    {
+        var user = new User(ValidUsername, ValidEmail, ValidPasswordHash);
+        user.ChangeEmail("new@example.com");
+        Assert.AreEqual("new@example.com", user.Email);
+    }
+
+    [TestMethod("不正なメールアドレスに変更すると例外")]
+    public void ChangeEmail_WithInvalidValue_ShouldThrow()
+    {
+        var user = new User(ValidUsername, ValidEmail, ValidPasswordHash);
+        var ex = Assert.ThrowsException<DomainException>(
+            () => user.ChangeEmail("invalid"));
+        Assert.AreEqual("メールアドレスの形式が不正です。", ex.Message);
+    }
+
+    [TestMethod("有効なパスワードに変更できる")]
+    public void ChangePassword_WithValidValue_ShouldSucceed()
+    {
+        var user = new User(ValidUsername, ValidEmail, ValidPasswordHash);
+        user.ChangePassword("newpwd");
+        Assert.AreEqual("newpwd", user.Password);
+    }
+
+    [TestMethod("空白のパスワードに変更すると例外")]
+    public void ChangePassword_WithInvalidValue_ShouldThrow()
+    {
+        var user = new User(ValidUsername, ValidEmail, ValidPasswordHash);
+        var ex = Assert.ThrowsException<DomainException>(
+            () => user.ChangePassword(""));
+        Assert.AreEqual("パスワードハッシュは必須です。", ex.Message);
+    }
+
+    [TestMethod("UUIDで等価と判定される")]
+    public void Equals_WithSameUuid_ShouldReturnTrue()
+    {
+        var uuid = Guid.NewGuid().ToString();
+        var u1 = new User(uuid, "A", "a@example.com", "p1");
+        var u2 = new User(uuid, "B", "b@example.com", "p2");
+        Assert.IsTrue(u1.Equals(u2));
+    }
+    
+    [TestMethod("異なるUUIDで非等価と判定される")]
+    public void Equals_WithDifferentUuid_ShouldReturnFalse()
+    {
+        var u1 = new User("A", "a@example.com", "p1");
+        var u2 = new User("B", "b@example.com", "p2");
+        Assert.IsFalse(u1.Equals(u2));
+    }
 }
