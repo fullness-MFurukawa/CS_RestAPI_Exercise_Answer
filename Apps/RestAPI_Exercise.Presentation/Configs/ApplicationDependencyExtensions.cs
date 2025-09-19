@@ -8,6 +8,9 @@ using RestAPI_Exercise.Infrastructure.Shared;
 using RestAPI_Exercise.Application.Usecases.Products.Interfaces;
 using RestAPI_Exercise.Application.Usecases.Products.Interactors;
 using RestAPI_Exercise.Presentation.Adapters;
+using Microsoft.AspNetCore.Identity;
+using RestAPI_Exercise.Application.Domains.Models;
+using RestAPI_Exercise.Application.Security;
 namespace RestAPI_Exercise.Presentation.Configs;
 /// <summary>
 /// 依存関係(DI)の設定
@@ -90,6 +93,11 @@ public static class ApplicationDependencyExtensions
         services.AddScoped<IUpdateProductUsecase, UpdateProductUsecase>();
         // ユースケース:[商品をキーワード検索する]を実現するインターフェイス
         services.AddScoped<ISearchProductByKeywordUsecase, SearchProductByKeywordUsecase>();
+
+        // ASP.NET Core Identityのパスワードハッシュ化・検証機能
+        services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+        // PBKDF2アルゴリズムを利用したパスワードハッシュ化・検証機能
+        services.AddScoped<IPasswordHashingService, PBKDF2PasswordHashingService>();
         return services;
     }
 

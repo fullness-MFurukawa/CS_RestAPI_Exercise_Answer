@@ -74,10 +74,7 @@ public class AppDbContext : DbContext
             e.HasIndex(s => s.ProductId).IsUnique();
         });
 
-        // ユーザーエンティティの制約（ユニークインデックスなど）を定義可能
-        modelBuilder.Entity<UserEntity>()
-            .Property(u => u.UserUuid)
-            .HasColumnType("char(36)");
+        // UserEntityの制約（ユニークインデックスなど）を定義可能
         modelBuilder.Entity<UserEntity>()
             .HasIndex(u => u.UserUuid)
             .IsUnique();

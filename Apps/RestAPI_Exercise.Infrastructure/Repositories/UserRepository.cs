@@ -110,7 +110,7 @@ public class UserRepository : IUserRepository
         {
             var entity = await _context.Users
             .AsNoTracking()
-            .FirstOrDefaultAsync(u => u.UserUuid.ToString() == useruuid);
+            .FirstOrDefaultAsync(u => u.UserUuid == useruuid);
             return entity != null ? await _adapter.RestoreAsync(entity) : null;
         }
         catch (Exception ex)
