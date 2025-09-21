@@ -72,7 +72,7 @@ public class User
     private void PasswordValidate(string password)
     {
         if (string.IsNullOrWhiteSpace(password))
-            throw new DomainException("パスワードハッシュは必須です。");
+            throw new DomainException("パスワードは必須です。");
     }
 
     /// <summary>

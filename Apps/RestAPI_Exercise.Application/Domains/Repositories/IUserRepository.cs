@@ -35,9 +35,16 @@ public interface IUserRepository
     Task<User?> SelectByIdAsync(string useruuid);
 
     /// <summary>
-    /// ユーザー名またはパスワードからユーザーを取得する
+    /// ユーザー名またはメールアドレスからユーザーを取得する(ログインで利用する)
     /// </summary>
     /// <param name="usernameOrEmail">ユーザー名またはメールアドレス</param>
     /// <returns>存在する場合:ドメインオブジェクト:User 存在しない場合:null</returns>
     Task<User?> SelectByUsernameOrEmailAsync(string usernameOrEmail);
+
+    /// <summary>
+    /// 引数に指定されたユーザーIdでユーザーを削除する
+    /// </summary>
+    /// <param name="userId">ユーザーId(UUID)</param>
+    /// <returns>true:削除成功 false:削除対象が存在しない</returns>
+    Task<bool> DeleteByUserIdAsync(string userId);
 }

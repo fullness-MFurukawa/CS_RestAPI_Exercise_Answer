@@ -120,4 +120,32 @@ public class UserRepository : IUserRepository
                 $"ユーザーIdでのユーザー取得に失敗しました。 userId={useruuid}", ex);
         }
     }
+
+    /// <summary>
+    /// 引数に指定されたユーザーIdでユーザーを削除する
+    /// </summary>
+    /// <param name="userId">ユーザーId(UUID)</param>
+    /// <returns>true:削除成功 false:削除対象が存在しない</returns>
+    public async Task<bool> DeleteByUserIdAsync(string userId)
+    {
+        try
+        {
+            // 削除対象のユーザーを取得する
+            var entity = await _context.Users.SingleOrDefaultAsync(u => u.UserUuid == userId);
+            if (entity is null)
+            {
+                return false; // 該当ユーザーが存在しない場合はfalseを返す
+            }
+            // ユーザーを削除する
+            _context.Users.Remove(entity);
+            // 削除結果をデータベースに反映させる
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        catch(Exception ex){
+            // InternalExceptionにラップしてスローする
+            throw new InternalException(
+                $"Id:{userId}のユーザー削除中に予期しないエラーが発生しました。", ex);
+        }
+    }
 }

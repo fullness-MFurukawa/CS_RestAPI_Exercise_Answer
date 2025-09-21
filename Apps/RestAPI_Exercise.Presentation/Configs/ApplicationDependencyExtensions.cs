@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 using RestAPI_Exercise.Infrastructure.Contexts;
 using RestAPI_Exercise.Infrastructure.Adapters;
 using RestAPI_Exercise.Application.Domains.Repositories;
@@ -8,9 +9,10 @@ using RestAPI_Exercise.Infrastructure.Shared;
 using RestAPI_Exercise.Application.Usecases.Products.Interfaces;
 using RestAPI_Exercise.Application.Usecases.Products.Interactors;
 using RestAPI_Exercise.Presentation.Adapters;
-using Microsoft.AspNetCore.Identity;
 using RestAPI_Exercise.Application.Domains.Models;
 using RestAPI_Exercise.Application.Security;
+using RestAPI_Exercise.Application.Usecases.Users.Interfaces;
+using RestAPI_Exercise.Application.Usecases.Users.Interactors;
 namespace RestAPI_Exercise.Presentation.Configs;
 /// <summary>
 /// 依存関係(DI)の設定
@@ -98,6 +100,8 @@ public static class ApplicationDependencyExtensions
         services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
         // PBKDF2アルゴリズムを利用したパスワードハッシュ化・検証機能
         services.AddScoped<IPasswordHashingService, PBKDF2PasswordHashingService>();
+        // ユースケース:[ユーザーを登録する]を実現するインターフェイス
+        services.AddScoped<IRegisterUserUsecase, RegisterUserUsecase>();
         return services;
     }
 
@@ -114,6 +118,9 @@ public static class ApplicationDependencyExtensions
         services.AddScoped<RegisterProductViewModelAdapter>();
         // UpdateProductViewModelからドメインオブジェクト:Productへ変換するアダプタ
         services.AddScoped<UpdateProductViewModelAdapter>();
+
+        // RegisterUserViewModelからドメインオブジェクト:Userへ変換するアダプタ
+        services.AddScoped<RegisterUserViewModelAdapter>();
         return services;
     }
 

@@ -21,30 +21,30 @@ public class PBKDF2PasswordHashingService : IPasswordHashingService
     /// <summary>
     /// 平文のパスワードをハッシュ化する
     /// </summary>
-    /// <param name="user">平文のパスワードを保持したUser</param>
-    /// <returns></returns>
-    public void Hash(User user)
+    /// <param name="rawPassword">平文パスワード</param>
+    /// <returns>ハッシュ化されたパスワード</returns>
+    public string Hash(string rawPassword)
     {
-        // パスワードをハッシュ化する
-        var hashPassword = _passwordHasher.HashPassword(user, user.Password);
-        // ハッシュ化したパスワードに変更する
-        user.ChangePassword(hashPassword);
+        // HashPasswordはユーザー情報を参照しないためダミーを利用する
+        var dummy = new User(Guid.NewGuid().ToString(), "tmp", "tmp@example.com", "x");
+        return _passwordHasher.HashPassword(dummy, rawPassword);
     }
 
     /// <summary>
     /// パスワードの比較結果を返す
     /// </summary>
-    /// <param name="user">ドメインオブジェクト:ユーザー</param>
+    /// <param name="hashedPassword">ハッシュされたパスワード</param>
     /// <param name="providedPassword">平文のパスワード</param>
     /// <returns>true:一致、false:不一致</returns>
     /// <exception cref="PasswordRehashNeededException">
     /// 　パスワードは一致したが、ハッシュの形式や強度が古い場合にスローされる
     /// </exception>
-    public bool Verify(User user, string providedPassword)
+    public bool Verify(string hashedPassword, string providedPassword)
     {
+        var dummy = new User(Guid.NewGuid().ToString(), "tmp", "tmp@example.com", hashedPassword);
         // パスワードを比較検証する
         var result =
-        _passwordHasher.VerifyHashedPassword(user, user.Password, providedPassword);
+        _passwordHasher.VerifyHashedPassword(dummy, hashedPassword, providedPassword);
         return result switch
         {
             // 一致したのtrueを返す
@@ -54,7 +54,7 @@ public class PBKDF2PasswordHashingService : IPasswordHashingService
             // 一致したが形式や強度が古いので、 PasswordRehashNeededExceptionをスローする
             PasswordVerificationResult.SuccessRehashNeeded =>
                 throw new PasswordRehashNeededException("パスワードは認証されたが、再ハッシュが必要です。"),
-                _ => false
+            _ => false
         };
     }
 }
