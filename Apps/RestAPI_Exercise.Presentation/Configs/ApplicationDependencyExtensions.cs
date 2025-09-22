@@ -13,6 +13,8 @@ using RestAPI_Exercise.Application.Domains.Models;
 using RestAPI_Exercise.Application.Security;
 using RestAPI_Exercise.Application.Usecases.Users.Interfaces;
 using RestAPI_Exercise.Application.Usecases.Users.Interactors;
+using RestAPI_Exercise.Application.Usecases.Authenticate.Interfaces;
+using RestAPI_Exercise.Application.Usecases.Authenticate.Interactors;
 namespace RestAPI_Exercise.Presentation.Configs;
 /// <summary>
 /// 依存関係(DI)の設定
@@ -102,6 +104,8 @@ public static class ApplicationDependencyExtensions
         services.AddScoped<IPasswordHashingService, PBKDF2PasswordHashingService>();
         // ユースケース:[ユーザーを登録する]を実現するインターフェイス
         services.AddScoped<IRegisterUserUsecase, RegisterUserUsecase>();
+        // ユースケース:[ログインする]を実現するインターフェイス
+        services.AddScoped<IAuthenticateUserUsecase, AuthenticateUserUsecase>();
         return services;
     }
 
