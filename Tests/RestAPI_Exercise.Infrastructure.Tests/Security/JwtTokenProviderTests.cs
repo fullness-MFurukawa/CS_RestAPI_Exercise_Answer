@@ -4,12 +4,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using RestAPI_Exercise.Application.Domains.Models;
 using RestAPI_Exercise.Application.Security;
 using RestAPI_Exercise.Infrastructure.Security;
 using RestAPI_Exercise.Presentation.Configs;
 
 namespace RestAPI_Exercise.Infrastructure.Tests.Security;
-
 /// <summary>
 /// IJwtTokenProviderインタフェース実装のテストドライバ
 /// </summary>
@@ -83,24 +83,16 @@ public class JwtTokenProviderTests
     public void Issue_Then_Validate_Succeeds_And_ClaimsReadable()
     {
         // データを用意する
-        var userId = Guid.NewGuid().ToString("N");
-        var username = "alice";
-        var email = "alice@example.com";
+        var user = new User("alice", "alice@example.com" , "pass001");
         // トークンを生成する
-        var token = _jwt.IssueAccessToken(userId, username, email);
+        var token = _jwt.IssueAccessToken(user);
         // nullでないことを検証する
         Assert.IsNotNull(token);
         // トークン文字列が空や空白でないことを検証する
-        Assert.IsFalse(string.IsNullOrWhiteSpace(token.Token));
-        // 発行日時(IssuedAt)が既定値(DateTimeOffsetのdefault)ではないことを検証する
-        Assert.AreNotEqual(default, token.IssuedAt);
-        // 有効期限(ExpiresAt)が既定値ではないことを検証する
-        Assert.AreNotEqual(default, token.ExpiresAt);
-        // 有効期限は必ず発行日時より未来になっていることを検証する
-        Assert.IsTrue(token.ExpiresAt > token.IssuedAt);
+        Assert.IsFalse(string.IsNullOrWhiteSpace(token));
 
         // トークンを検証する
-        var principal = _jwt.ValidateToken(token.Token);
+        var principal = _jwt.ValidateToken(token);
         // クレームを読み取る
         var sub = principal.FindFirst(JwtRegisteredClaimNames.Sub)?.Value
             ?? principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -109,11 +101,11 @@ public class JwtTokenProviderTests
         var mail = principal.FindFirst(JwtRegisteredClaimNames.Email)?.Value
             ?? principal.FindFirst(ClaimTypes.Email)?.Value;
         // Idを検証する
-        Assert.AreEqual(userId, sub);
+        Assert.AreEqual(user.UserUuid, sub);
         // ユーザー名を検証する
-        Assert.AreEqual(username, name);
+        Assert.AreEqual(user.Username, name);
         // メールアドレスを検証する
-        Assert.AreEqual(email, mail);
+        Assert.AreEqual(user.Email, mail);
     }
 
     [TestMethod("署名鍵が異なる場合、SecurityTokenExceptionをスローする")]
@@ -123,8 +115,8 @@ public class JwtTokenProviderTests
         var issuer = "Exercise:Backend";
         var audience = "Exercise:Frontend";
         // トークンを発行する
-        var goodToken = _jwt.IssueAccessToken(
-            Guid.NewGuid().ToString("N"), "bob", "bob@example.com");
+        var user = new User("bob", "bob@example.com" , "pass001");
+        var goodToken = _jwt.IssueAccessToken(user);
 
         // 異なるSecretKeyのプロバイダを手動生成
         var badOptions = Options.Create(new JwtSettings
@@ -137,7 +129,7 @@ public class JwtTokenProviderTests
         var badProvider = new JwtTokenProvider(badOptions);
         try
         {
-            _ = badProvider.ValidateToken(goodToken.Token);
+            _ = badProvider.ValidateToken(goodToken);
             Assert.Fail("SecurityTokenException 系の例外が投げられるべきです。");
         }
         catch (SecurityTokenException)
@@ -154,7 +146,8 @@ public class JwtTokenProviderTests
     public void Validate_Fails_When_Audience_Is_Wrong()
     {
         // トークンを生成する
-        var token = _jwt.IssueAccessToken(Guid.NewGuid().ToString("N"), "carol", "carol@example.com");
+        var user = new User("carol", "carol@example.com" , "pass001");
+        var token = _jwt.IssueAccessToken(user);
         // Audienceを変更したJWT認証に必要な設定値を用意する
         var altered = Options.Create(new JwtSettings
         {
@@ -166,7 +159,7 @@ public class JwtTokenProviderTests
         var validator = new JwtTokenProvider(altered);
         try
         {
-            _ = validator.ValidateToken(token.Token);
+            _ = validator.ValidateToken(token);
             Assert.Fail("SecurityTokenException 系の例外が投げられるべきです。");
         }
         catch (SecurityTokenException)
@@ -193,18 +186,18 @@ public class JwtTokenProviderTests
         });
 
         var provider = new JwtTokenProvider(shortOptions, fixedNow);
-        var userId = Guid.NewGuid().ToString("N");
-        var token = provider.IssueAccessToken(userId, "dave", "dave@example.com");
+        var user = new User("dave", "dave@example.com" , "pass001");
+        var token = provider.IssueAccessToken(user);
         // 既定のClockSkewは5分なので、6分以上進めて確実に期限切れ扱いにする
         fixedNow.Advance(TimeSpan.FromMinutes(6));
         // クレームを抽出する
-        var principal = provider.GetPrincipalFromExpiredToken(token.Token);
+        var principal = provider.GetPrincipalFromExpiredToken(token);
         // nullでないことを検証する
         Assert.IsNotNull(principal);
         // Id を検証する（sub → NameIdentifier へのマッピングに対応）
         var sub = principal.FindFirst(JwtRegisteredClaimNames.Sub)?.Value
             ?? principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        Assert.AreEqual(userId, sub);
+        Assert.AreEqual(user.UserUuid, sub);
     } 
     
     [TestMethod("SecretKey 未設定の場合はコンストラクタで例外が発生する")]

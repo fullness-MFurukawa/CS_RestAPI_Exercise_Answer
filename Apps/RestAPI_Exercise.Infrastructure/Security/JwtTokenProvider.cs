@@ -33,12 +33,12 @@ public class JwtTokenProvider : IJwtTokenProvider
     /// <summary>
     /// アクセストークンを発行し、ドメインオブジェクト :JWTTokenを返す
     /// </summary>
-    /// <param name="userId">ユーザーId(UUID)</param>
-    /// <param name="username">ユーザー名(表示名)</param>
-    /// <param name="email">メールアドレス</param>
+    /// <param name="user">
+    ///     ユーザーのドメインオブジェクト（UserUuid/Username/Emailを利用）
+    /// </param>
     /// <param name="extraClaims">追加のクレーム(任意)</param>
-    /// <returns>ドメインオブジェクト :JWTToken</returns>
-    public JWTToken IssueAccessToken(string userId, string? username = null, string? email = null, IEnumerable<Claim>? extraClaims = null)
+    /// <returns>JWT文字列("header.payload.signature")</returns>
+    public string IssueAccessToken(User user, IEnumerable<Claim>? extraClaims = null)
     {
         // 現在のUTC時刻を取得する(トークンの発行日時として使用する)
         var nowUtc = _time.GetUtcNow().UtcDateTime;
@@ -48,7 +48,7 @@ public class JwtTokenProvider : IJwtTokenProvider
         var claims = new List<Claim>
         {
             // Subject(このトークンが紐づくユーザーId)
-            new(JwtRegisteredClaimNames.Sub, userId),
+            new(JwtRegisteredClaimNames.Sub, user.UserUuid),
             // JWTID(一意な識別子でトークンの一意性や再利用防止に利用できる)
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString("N")),
             // IssuedAt(トークン発行時刻でUNIX秒で表現)
@@ -58,16 +58,10 @@ public class JwtTokenProvider : IJwtTokenProvider
         };
         // unique_name:ユーザー名(表示用)
         // 認証後に HttpContext.User.Identity.Nameとして参照される
-        if (!string.IsNullOrWhiteSpace(username))
-        {
-            claims.Add(new(JwtRegisteredClaimNames.UniqueName, username));
-        }
+        claims.Add(new(JwtRegisteredClaimNames.UniqueName, user.Username));
         // email:ユーザーのメールアドレス
         // 認証後に ClaimTypes.Emailとして参照される
-        if (!string.IsNullOrWhiteSpace(email))
-        {
-            claims.Add(new(JwtRegisteredClaimNames.Email, email));
-        }
+        claims.Add(new(JwtRegisteredClaimNames.Email, user.Email));
         // 呼び出し側で追加したいクレームがある場合はまとめて追加する
         if (extraClaims is not null)
         {
@@ -76,7 +70,7 @@ public class JwtTokenProvider : IJwtTokenProvider
         // トークンに署名するための資格情報を生成する
         var creds = new SigningCredentials(
             BuildSecurityKey(_settings.SecretKey),// 生成した秘密鍵
-            SecurityAlgorithms.HmacSha256);// 署名アルゴリズムには HMAC-SHA256 を指定
+            SecurityAlgorithms.HmacSha256);// 署名アルゴリズムにはHMAC-SHA256を指定
         // JWTトークン本体を生成する
         var jwt = new JwtSecurityToken(
             issuer: _settings.Issuer,             // iss: 発行者
@@ -89,14 +83,8 @@ public class JwtTokenProvider : IJwtTokenProvider
         // JwtSecurityTokenオブジェクトを文字列にシリアライズする
         // 形式は「Header / Payload / Signature」の3区切り(Base64Urlエンコード)で構成される
         var tokenString = new JwtSecurityTokenHandler().WriteToken(jwt);
-        // JWTトークンを表すドメインオブジェクトを生成して返す
-        return new JWTToken(
-            userId: userId,
-            token: tokenString,
-            issuedAt: new DateTimeOffset(nowUtc, TimeSpan.Zero),
-            expiresAt: new DateTimeOffset(expiresUtc, TimeSpan.Zero),
-            deviceInfo: null
-        );
+        // JWTトークン返す
+        return tokenString;
     }
 
     /// <summary>

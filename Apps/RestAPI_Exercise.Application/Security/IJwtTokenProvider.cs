@@ -10,13 +10,12 @@ public interface IJwtTokenProvider
     /// <summary>
     /// アクセストークンを発行し、ドメインオブジェクト :JWTTokenを返す
     /// </summary>
-    /// <param name="userId">ユーザーId(UUID)</param>
-    /// <param name="username">ユーザー名(表示名)</param>
-    /// <param name="email">メールアドレス</param>
+    /// <param name="user">
+    ///     ユーザーのドメインオブジェクト（UserUuid/Username/Emailを利用）
+    /// </param>
     /// <param name="extraClaims">追加のクレーム(任意)</param>
-    /// <returns>ドメインオブジェクト :JWTToken</returns>
-    JWTToken IssueAccessToken(string userId, string? username = null,
-        string? email = null, IEnumerable<Claim>? extraClaims = null);
+    /// <returns>JWT文字列("header.payload.signature")</returns>
+    string IssueAccessToken(User user, IEnumerable<Claim>? extraClaims = null);
 
     /// <summary>
     /// トークンを検証して正当なら認証済みユーザーを表すオブジェクト:ClaimsPrincipalを返す
