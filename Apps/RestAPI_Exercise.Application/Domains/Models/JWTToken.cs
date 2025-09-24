@@ -4,7 +4,7 @@ namespace RestAPI_Exercise.Application.Domains.Models;
 /// JWTトークンを表すドメインオブジェクト
 /// </summary>
 public class JWTToken
-{
+ {
     /// <summary>
     /// トークン識別子（UUID）
     /// </summary>
@@ -86,7 +86,7 @@ public class JWTToken
     public override bool Equals(object? obj)
     {
         if (ReferenceEquals(this, obj)) return true;
-        return obj is JWTToken other && TokenId == other.TokenId;
+            return obj is JWTToken other && TokenId == other.TokenId;
     }
     public override int GetHashCode() => TokenId.GetHashCode();
 

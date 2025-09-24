@@ -15,6 +15,7 @@ using RestAPI_Exercise.Application.Usecases.Users.Interfaces;
 using RestAPI_Exercise.Application.Usecases.Users.Interactors;
 using RestAPI_Exercise.Application.Usecases.Authenticate.Interfaces;
 using RestAPI_Exercise.Application.Usecases.Authenticate.Interactors;
+using RestAPI_Exercise.Infrastructure.Security;
 namespace RestAPI_Exercise.Presentation.Configs;
 /// <summary>
 /// 依存関係(DI)の設定
@@ -35,9 +36,9 @@ public static class ApplicationDependencyExtensions
         // インフラストラクチャ層の依存関係を追加
         services.AddInfrastructureDependencies(config);
         // アプリケーション層の依存関係を追加
-        services.AddApplicationLayerDependencies();
+        services.AddApplicationLayerDependencies(config);
         // プレゼンテーション層の依存関係を追加
-        services.AddPresentationLayerDependencies();
+        services.AddPresentationLayerDependencies(config);
         return services;
     }
 
@@ -80,6 +81,9 @@ public static class ApplicationDependencyExtensions
         services.AddScoped<UserEntityAdapter>();
         // ドメインオブジェクト:User(ユーザー)のCRUD操作インターフェイスの実装
         services.AddScoped<IUserRepository, UserRepository>();
+
+        // JWTの発行・検証インターフェイスの実装
+        services.AddSingleton<IJwtTokenProvider, JwtTokenProvider>();
         return services;
     }
 
@@ -89,7 +93,7 @@ public static class ApplicationDependencyExtensions
     /// <param name="services">依存関係注入(DI)のサービスコレクション</param>
     /// <returns></returns>
     private static IServiceCollection AddApplicationLayerDependencies(
-        this IServiceCollection services)
+        this IServiceCollection services, IConfiguration config)
     {
         // ユースケース:[新商品を登録する]を実現するインターフェイス
         services.AddScoped<IRegisterProductUsecase, RegisterProductUsecase>();
@@ -106,6 +110,9 @@ public static class ApplicationDependencyExtensions
         services.AddScoped<IRegisterUserUsecase, RegisterUserUsecase>();
         // ユースケース:[ログインする]を実現するインターフェイス
         services.AddScoped<IAuthenticateUserUsecase, AuthenticateUserUsecase>();
+
+        // JwtSettingsをバインドしてDIに登録する
+        services.Configure<JwtSettings>(config.GetSection("JwtSettings"));
         return services;
     }
 
@@ -114,7 +121,8 @@ public static class ApplicationDependencyExtensions
     /// </summary>
     /// <param name="services">依存関係注入(DI)のサービスコレクション</param>
     /// <returns></returns>
-    private static IServiceCollection AddPresentationLayerDependencies(this IServiceCollection services)
+    private static IServiceCollection AddPresentationLayerDependencies(
+        this IServiceCollection services, IConfiguration config)
     {
         // コントローラをサービスコレクションに登録する
         services.AddControllers();
