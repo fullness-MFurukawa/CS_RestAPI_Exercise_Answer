@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using RestAPI_Exercise.Application.Domains.Models;
 using RestAPI_Exercise.Application.Usecases.Products.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 namespace RestAPI_Exercise.Presentation.Controllers;
 /// <summary>
 /// ユースケース:[商品をキーワード検索する]を実現するコントローラ
@@ -27,8 +28,8 @@ public class SearchProductByKeywordController : ControllerBase
     /// </summary>
     /// <param name="keyword">検索キーワード</param>
     /// <returns>検索結果の商品一覧</returns>
+    [Authorize]
     [HttpGet]
-    // [ProducesResponseType]から[SwaggerResponse]に変更する
     [SwaggerResponse(StatusCodes.Status200OK, "検索に成功した場合、商品リストを返す", typeof(List<Product>))]
     [SwaggerResponse(StatusCodes.Status400BadRequest, "キーワード未入力など、リクエストが不正な場合")]
     public async Task<IActionResult> Search([FromQuery] string keyword)

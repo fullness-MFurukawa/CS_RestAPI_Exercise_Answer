@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RestAPI_Exercise.Application.Domains.Models;
 using RestAPI_Exercise.Application.Exceptions;
@@ -33,6 +34,7 @@ public class RegisterProductController : ControllerBase
     /// 商品カテゴリ一覧の取得
     /// </summary>
     /// <returns></returns>
+    [Authorize]
     [HttpGet("categories")]
     [SwaggerOperation(Summary = "商品カテゴリ一覧を取得", 
                       Description = "登録可能なすべての商品カテゴリを返す")]
@@ -48,6 +50,7 @@ public class RegisterProductController : ControllerBase
     /// </summary>
     /// <param name="categoryId">商品カテゴリId(UUID)</param>
     /// <returns>該当するカテゴリが存在すればOK(200)、存在しなければNotFound(404)</returns>
+    [Authorize]
     [HttpGet("categories/{categoryId}")]
     [SwaggerOperation(Summary = "商品カテゴリの取得", 
                       Description = "指定された商品カテゴリIdに一致する商品カテゴリを返す")]
@@ -75,6 +78,7 @@ public class RegisterProductController : ControllerBase
     /// <returns>
     /// 存在しない場合:Ok(200)、存在する場合:Conflict(409) 
     /// </returns>
+    [Authorize]
     [HttpGet("validate")]
     [SwaggerOperation(Summary = "商品名の存在確認", 
                       Description = "商品名が既に存在するかを検証する")]
@@ -108,6 +112,7 @@ public class RegisterProductController : ControllerBase
     /// </summary>
     /// <param name="model">商品登録用ViewModel</param>
     /// <returns></returns>
+    [Authorize]
     [HttpPost]
     [SwaggerOperation(Summary = "新商品を登録", 
                       Description = "商品情報を受け取り、商品を登録する")]

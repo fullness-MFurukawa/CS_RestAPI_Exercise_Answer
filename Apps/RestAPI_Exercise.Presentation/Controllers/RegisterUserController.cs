@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RestAPI_Exercise.Application.Domains.Models;
 using RestAPI_Exercise.Application.Exceptions;
@@ -31,6 +32,13 @@ public class RegisterUserController : ControllerBase
         _adapter = adapter;
     }
 
+    /// <summary>
+    /// ユーザー名またはメールアドレスが登録済みかを検証する
+    /// </summary>
+    /// <param name="username"></param>
+    /// <param name="email"></param>
+    /// <returns></returns>
+    [Authorize]
     [HttpGet("check")]
     [SwaggerOperation(Summary = "ユーザー名、メールアドレスの重複チェック",
                       Description = "ユーザー名、メールアドレスの存在を検証する")]
@@ -59,10 +67,11 @@ public class RegisterUserController : ControllerBase
     }
 
     /// <summary>
-    /// ユーザーの登録
+    /// ユーザーを登録する
     /// </summary>
     /// <param name="viewModel">ユースケース:[ユーザーを登録する]を実現するViewModel</param>
     /// <returns></returns>
+    [Authorize]
     [HttpPost]
     [SwaggerOperation(Summary = "ユーザーを登録",
                       Description = "ユーザー情報を受け取り、ユーザーを登録する")]

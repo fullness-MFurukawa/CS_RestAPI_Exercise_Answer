@@ -172,7 +172,7 @@ public class JwtTokenProviderTests
         }
     }
 
-    [TestMethod("期限切れトークンからクレームを抽出できる（GetPrincipalFromExpiredToken）")]
+    [TestMethod("期限切れトークンからクレームを抽出できる")]
     public void GetPrincipalFromExpiredToken_Returns_Claims_When_Expired()
     {
         // Arrange: 固定時刻で短期トークンを発行
