@@ -9,6 +9,12 @@ builder.Services.AddJwtAuthentication(builder.Configuration);
 // Swagger(Open API)のサービス登録する
 builder.Services.AddSwaggerWithJwt();
 
+// Kestrelの設定をappsettings.jsonから読取り設定する
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Configure(builder.Configuration.GetSection("Kestrel"));
+});
+
 // WebApplicationを生成する
 var app = builder.Build();
 
@@ -23,8 +29,17 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-// HTTPリクエストをHTTPSへ自動リダイレクトするミドルウェアを有効化
+// 例外ハンドリングを登録する
+app.UseExceptionHandling();
+
+// HTTPリクエストをHTTPSへ自動リダイレクトするKestrelミドルウェアを有効化
 app.UseHttpsRedirection();
+// HSTSを有効化
+app.UseHsts();
+
+// CORSを有効化する
+app.UseCors(CorsServiceExtensions.GetPolicyName());
+
 // 認証(Authentication)を有効化する
 app.UseAuthentication();
 // 認可(Authorization)を有効化する

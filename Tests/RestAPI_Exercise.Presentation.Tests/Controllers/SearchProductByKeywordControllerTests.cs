@@ -83,8 +83,13 @@ public class SearchProductByKeywordControllerTests
         var bad = result as BadRequestObjectResult;
         // nullでないことを検証する
         Assert.IsNotNull(bad);
+        // レスポンスステータスを検証する
+        Assert.AreEqual(StatusCodes.Status400BadRequest, bad!.StatusCode);
+        // レスポンスボディを取得する
         var val = bad.Value!;
+        // コードを取り出す
         var code = val.GetType().GetProperty("code")?.GetValue(val) as string;
+        // メッセージを取り出す
         var msg = val.GetType().GetProperty("message")?.GetValue(val) as string;
         // コードを検証する
         Assert.AreEqual("INVALID_KEYWORD", code);
@@ -96,13 +101,19 @@ public class SearchProductByKeywordControllerTests
     public async Task Search_ShouldReturnOkWithProducts_WhenKeywordExists()
     {
         var result = await _controller!.Search("蛍光");
+        // result(IActionResult)をOkObjectResultに変換する
         var ok = result as OkObjectResult;
+        // nullでないことを検証する
         Assert.IsNotNull(ok);
+        // レスポンスステータスを検証する
         Assert.AreEqual(StatusCodes.Status200OK, ok!.StatusCode);
-
+        // レスポンスボディを取り出す
         var products = ok.Value as List<Product>;
+        // nullでないことを検証する
         Assert.IsNotNull(products);
+        // 件数が4であることを検証する
         Assert.AreEqual(4, products!.Count);
+        // 取得結果を表示する
         foreach (var product in products)
         {
             _testContext?.WriteLine(product.ToString());
@@ -113,12 +124,17 @@ public class SearchProductByKeywordControllerTests
     public async Task Search_ShouldReturnOkWithEmptyList_WhenNoMatches()
     {
         var result = await _controller!.Search("ゴム");
+        // result(IActionResult)をOkObjectResultに変換する
         var ok = result as OkObjectResult;
+        // nullでないことを検証する
         Assert.IsNotNull(ok);
+        // レスポンスステータスを検証する
         Assert.AreEqual(StatusCodes.Status200OK, ok!.StatusCode);
-
+        // レスポンスボディを取得する
         var products = ok.Value as List<Product>;
+        // nullでないことを検証する
         Assert.IsNotNull(products);
+        // 件数が0であることを検証する
         Assert.AreEqual(0, products!.Count);
     }
 
@@ -126,13 +142,19 @@ public class SearchProductByKeywordControllerTests
     public async Task Search_ShouldTrimKeyword_BeforeUsecase()
     {
         var result = await _controller!.Search("  蛍光  ");
+        // result(IActionResult)をOkObjectResultに変換する
         var ok = result as OkObjectResult;
+        // nullでないことを検証する
         Assert.IsNotNull(ok);
+        // レスポンスステータスを検証する
         Assert.AreEqual(StatusCodes.Status200OK, ok!.StatusCode);
-
+        // レスポンスボディを取得する
         var products = ok.Value as List<Product>;
+        // nullでないことを検証する
         Assert.IsNotNull(products);
+        // 件数が4であることを検証する
         Assert.AreEqual(4, products!.Count);
+        // 取得結果を表示する
         foreach (var product in products)
         {
             _testContext?.WriteLine(product.ToString());

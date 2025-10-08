@@ -4,7 +4,7 @@ using RestAPI_Exercise.Presentation.ViewModels;
 namespace RestAPI_Exercise.Presentation.Adapters;
 /// <summary>
 /// UpdateProductViewModelからドメインオブジェクト:Productへ変換するアダプタ
-/// </summary> <summary>
+/// </summary>
 public class UpdateProductViewModelAdapter : IRestorer<Product, UpdateProductViewModel>
 {
     /// <summary>
