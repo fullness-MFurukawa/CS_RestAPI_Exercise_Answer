@@ -30,11 +30,12 @@ public static class SwaggerExtensions
             {
                 Title = "🚀 C#(ASP.NET Core) RestAPI Exercise",
                 Version = "v1",
+                // 変更
                 Description = "このAPIは **JWT認証** を利用しています。\n\n" +
-                    "1. [Authorize]ボタンをクリックして、トークンを入力して認証\n" +
-                    "2. 認証が必要なエンドポイントを試ことができます\n" +
-                    "3. 認証なしのアクセスが拒否されることも確認できます",
-   
+                "認証方式:\n\n" +
+                "・通常のフロントアプリからは HttpOnly Cookie を使用します。\n\n" +
+                "・Swagger UI では [Authorize] ボタンで JWT を直接入力してヘッダ送信してください。",
+                  
                 License = new OpenApiLicense
                 {
                     Name = "MIT",

@@ -26,6 +26,12 @@ if (app.Environment.IsDevelopment())
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "RestAPI Exercise v1");
         c.RoutePrefix = string.Empty; // ルートURLでUIを開く
+
+        // SwaggerがCookieを含めてリクエスト/レスポンスするようにする
+        c.ConfigObject.AdditionalItems["requestInterceptor"] =
+        new Microsoft.OpenApi.Any.OpenApiString(
+            "request => { request.credentials = 'include'; return request; }"
+        );
     });
 }
 
