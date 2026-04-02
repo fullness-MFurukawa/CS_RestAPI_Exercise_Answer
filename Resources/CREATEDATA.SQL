@@ -1,35 +1,36 @@
-CREATE DATABASE restapi_exercise CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-USE restapi_exercise;
+CREATE DATABASE restapi_exercise ENCODING 'UTF8';
+
 CREATE TABLE product_category (
-    id             INT         NOT NULL AUTO_INCREMENT,
-    category_uuid  VARCHAR(36)    NOT NULL UNIQUE DEFAULT (UUID()),
-    name           VARCHAR(20) DEFAULT NULL,
-    PRIMARY KEY (id)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
+id             INT         GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+category_uuid  UUID        NOT NULL UNIQUE DEFAULT gen_random_uuid(),
+name           VARCHAR(20) DEFAULT NULL
+);
 
 CREATE TABLE product (
-    id            INT         NOT NULL AUTO_INCREMENT,
-    product_uuid  VARCHAR(36)    NOT NULL UNIQUE DEFAULT (UUID()),
-    name          VARCHAR(30) DEFAULT NULL,
-    price         INT         DEFAULT NULL,
-    category_id   INT         DEFAULT NULL,
-    PRIMARY KEY (id),
-    KEY category_id (category_id),
-    CONSTRAINT product_ibfk_1 FOREIGN KEY (category_id) REFERENCES product_category (id)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
+id            INT         GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+product_uuid  UUID        NOT NULL UNIQUE DEFAULT gen_random_uuid(),
+name          VARCHAR(30) DEFAULT NULL,
+price         INT         DEFAULT NULL,
+category_id   INT         DEFAULT NULL,
+CONSTRAINT product_ibfk_1 FOREIGN KEY (category_id) REFERENCES product_category (id)
+);
+
+CREATE INDEX idx_product_category_id ON product (category_id);
 
 CREATE TABLE product_stock (
-    id           INT         NOT NULL AUTO_INCREMENT,
-    stock_uuid   VARCHAR(36)    NOT NULL UNIQUE DEFAULT (UUID()),
-    stock        INT         DEFAULT NULL,
-    product_id   INT         DEFAULT NULL,
-    PRIMARY KEY (id),
-    KEY product_id (product_id),
-    CONSTRAINT product_stock_ibfk_1 FOREIGN KEY (product_id) REFERENCES product (id)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
+id          INT  GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+stock_uuid  UUID NOT NULL UNIQUE DEFAULT gen_random_uuid(),
+stock       INT  DEFAULT NULL,
+product_id  INT  DEFAULT NULL,
+CONSTRAINT product_stock_ibfk_1 FOREIGN KEY (product_id) REFERENCES product (id)
+);
 
-INSERT INTO product_category (name) VALUES
-('文房具'), ('雑貨'), ('パソコン周辺機器');
+CREATE INDEX idx_product_stock_product_id ON product_stock (product_id);
+
+INSERT INTO product_category (category_uuid, name) VALUES
+('2f4d3e51-6f6b-11f0-954a-00155d1bd29a', '文房具'),
+('2f5016b6-6f6b-11f0-954a-00155d1bd29a', '雑貨'),
+('2f501b67-6f6b-11f0-954a-00155d1bd29a', 'パソコン周辺機器');
 
 -- 文房具カテゴリ（category_id = 1）
 INSERT INTO product (product_uuid, name, price, category_id) VALUES
@@ -70,5 +71,28 @@ INSERT INTO product (product_uuid, name, price, category_id) VALUES
 
 
 INSERT INTO product_stock (stock_uuid, stock, product_id)
-SELECT UUID(), 100, id
+SELECT gen_random_uuid(), 100, id
 FROM product;
+
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TABLE users (
+    user_id       INT          GENERATED ALWAYS AS IDENTITY (START WITH 51) PRIMARY KEY,
+    user_uuid     UUID         NOT NULL UNIQUE,
+    username      VARCHAR(30)  NOT NULL UNIQUE,
+    email         VARCHAR(100) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    created_at    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TRIGGER update_users_updated_at
+BEFORE UPDATE ON users
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();

@@ -8,6 +8,7 @@ namespace RestAPI_Exercise.Infrastructure.Entities;
 public class ProductEntity
 {
     [Key] // 主キーをマッピング
+    [Column("id")]
     // 列名と同じ名称のプロパティなので[Column]は使わない
     public int Id { get; set; }
 
@@ -16,11 +17,13 @@ public class ProductEntity
     [Column("product_uuid")]// マッピングする列名
     public string ProductUuid { get; set; } = string.Empty;
 
+    [Column("name")]
     [Required] // NOT NULL
     [StringLength(20)]// データ長は20文字
     // 列名と同じ名称のプロパティなので[Column]は使わない
     public string Name { get; set; } = string.Empty;
 
+    [Column("price")]
     [Required] // NOT NULL
     // 列名と同じ名称のプロパティなので[Column]は使わない
     public int Price { get; set; }

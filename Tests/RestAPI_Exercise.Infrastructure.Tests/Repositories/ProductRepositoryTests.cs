@@ -90,11 +90,11 @@ public class ProductRepositoryTests
         // 商品名を検証する
         Assert.AreEqual("水性ボールペン(赤)", product.Name);
         // 単価を検証する
-        Assert.AreEqual(100, product.Price);
+        Assert.AreEqual(120, product.Price);
         // 商品在庫がnullでないことを検証する
         Assert.IsNotNull(product.Stock);
         // 商品在庫Idを検証する
-        Assert.AreEqual("828fc152-6f6b-11f0-954a-00155d1bd29a", product.Stock.StockUuid);
+        Assert.AreEqual("684b2cb1-7c4d-4b56-9975-e7facd06ab23", product.Stock.StockUuid);
         // 在庫数を検証する
         Assert.AreEqual(100, product.Stock.Stock);
         // 商品カテゴリIdを検証する
@@ -191,7 +191,7 @@ public class ProductRepositoryTests
         // 単価を検証する
         Assert.AreEqual(130, products[0].Price);
         // 商品在庫Idを検証する
-        Assert.AreEqual("828fc727-6f6b-11f0-954a-00155d1bd29a", products[0].Stock!.StockUuid);
+        Assert.AreEqual("45a6b979-b0bc-400f-a450-88e554accb56", products[0].Stock!.StockUuid);
         // 商品在庫数を検証する
         Assert.AreEqual(100, products[0].Stock!.Stock);
         // 商品カテゴリIdを検証する
@@ -207,7 +207,7 @@ public class ProductRepositoryTests
         // 単価を検証する
         Assert.AreEqual(130, products[1].Price);
         // 商品在庫Idを検証する
-        Assert.AreEqual("828fc78f-6f6b-11f0-954a-00155d1bd29a", products[1].Stock!.StockUuid);
+        Assert.AreEqual("04266bd3-09ce-4a41-bb95-47a98c2f056b", products[1].Stock!.StockUuid);
         // 商品在庫数を検証する
         Assert.AreEqual(100, products[1].Stock!.Stock);
         // 商品カテゴリIdを検証する
@@ -222,7 +222,7 @@ public class ProductRepositoryTests
         // 単価を検証する
         Assert.AreEqual(130, products[2].Price);
         // 商品在庫Idを検証する
-        Assert.AreEqual("828fc805-6f6b-11f0-954a-00155d1bd29a", products[2].Stock!.StockUuid);
+        Assert.AreEqual("0adcd322-cb08-4804-b8da-35cdf841b8c3", products[2].Stock!.StockUuid);
         // 商品在庫数を検証する
         Assert.AreEqual(100, products[2].Stock!.Stock);
         // 商品カテゴリIdを検証する
@@ -237,7 +237,7 @@ public class ProductRepositoryTests
         // 単価を検証する
         Assert.AreEqual(130, products[3].Price);
         // 商品在庫Idを検証する
-        Assert.AreEqual("828fc869-6f6b-11f0-954a-00155d1bd29a", products[3].Stock!.StockUuid);
+        Assert.AreEqual("104f63a3-7c5c-4c74-84a1-c3bfa65a2bc4", products[3].Stock!.StockUuid);
         // 商品在庫数を検証する
         Assert.AreEqual(100, products[3].Stock!.Stock);
         // 商品カテゴリIdを検証する

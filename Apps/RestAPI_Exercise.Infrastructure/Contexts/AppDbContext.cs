@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using RestAPI_Exercise.Infrastructure.Entities;
 namespace RestAPI_Exercise.Infrastructure.Contexts;
 /// <summary>
-/// アプリケーション用データベースコンテキスト（MySQL対応）
+/// アプリケーション用データベースコンテキスト（PostgreSQL対応）
 /// 方針：
 /// - Product : ProductCategory = N:1（カテゴリ削除で商品も削除：Cascade）
 /// - Product : ProductStock    = 1:1（商品削除で在庫も削除：Cascade）
@@ -15,7 +15,9 @@ public class AppDbContext : DbContext
     /// コンストラクタ
     /// </summary>
     /// <param name="options"></param>
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+    {
+    }
     /// <summary>
     /// 商品テーブルアクセスプロパティ
     /// </summary>
@@ -44,7 +46,7 @@ public class AppDbContext : DbContext
             e.HasIndex(p => p.ProductUuid).IsUnique();
             // 商品名はvarchar(30)でNULL許容
             e.Property(p => p.Name).HasMaxLength(30);
-            // 商品カテゴリと商品のカーディナリティ(1:N)　商品カテゴリ削除時に商品も削除
+            // 商品カテゴリと商品のカーディナリティ(1:N) 商品カテゴリ削除時に商品も削除
             e.HasOne(p => p.ProductCategory)
                 .WithMany(c => c.Products!)
                 .HasForeignKey(p => p.ProductCategoryId)
@@ -56,6 +58,12 @@ public class AppDbContext : DbContext
                 .HasForeignKey<ProductStockEntity>(s => s.ProductId)
                 .HasConstraintName("product_stock_ibfk_product")
                 .OnDelete(DeleteBehavior.Cascade);
+            // C#のstring ⇔ PostgreSQLのuuidを自動変換する
+            e.Property(p => p.ProductUuid)
+             .HasConversion(
+                 v => Guid.Parse(v),
+                 v => v.ToString()
+            );
         });
         // 商品カテゴリの動作設定
         modelBuilder.Entity<ProductCategoryEntity>(e =>
@@ -64,6 +72,13 @@ public class AppDbContext : DbContext
             e.HasIndex(c => c.CategoryUuid).IsUnique();
             // 商品カテゴリ名はvarchar(30)でNULL許容
             e.Property(c => c.Name).HasMaxLength(30);
+
+            // C#のstring ⇔ PostgreSQLのuuidを自動変換する
+            e.Property(c => c.CategoryUuid)
+             .HasConversion(
+                 v => Guid.Parse(v),  // C#(string)をDB(uuid)に書き込む時の処理
+                 v => v.ToString()    // DB(uuid)をC#(string)に読み込む時の処理
+            );
         });
         // 商品在庫の動作設定
         modelBuilder.Entity<ProductStockEntity>(e =>
@@ -72,18 +87,28 @@ public class AppDbContext : DbContext
             e.HasIndex(s => s.StockUuid).IsUnique();
             // 商品Id(UUID)はユニーク
             e.HasIndex(s => s.ProductId).IsUnique();
+            // C#のstring ⇔ PostgreSQLのuuidを自動変換する
+            e.Property(s => s.StockUuid)
+             .HasConversion(
+                 v => Guid.Parse(v),
+                 v => v.ToString()
+            );
         });
 
-        // UserEntityの制約（ユニークインデックスなど）を定義可能
-        modelBuilder.Entity<UserEntity>()
-            .HasIndex(u => u.UserUuid)
-            .IsUnique();
-        modelBuilder.Entity<UserEntity>()
-            .HasIndex(u => u.Username)
-            .IsUnique();
-        modelBuilder.Entity<UserEntity>()
-            .HasIndex(u => u.Email)
-            .IsUnique();
 
+        // UserEntityの制約（ユニークインデックスなど）を定義可能
+        modelBuilder.Entity<UserEntity>(e => 
+        {
+            e.HasIndex(u => u.UserUuid).IsUnique();
+            e.HasIndex(u => u.Username).IsUnique();
+            e.HasIndex(u => u.Email).IsUnique();
+
+            // C#のstring ⇔ PostgreSQLのuuidを自動変換する
+            e.Property(u => u.UserUuid)
+             .HasConversion(
+                 v => Guid.Parse(v),
+                 v => v.ToString()
+             );
+        });
     }
 }

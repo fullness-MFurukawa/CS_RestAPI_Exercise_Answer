@@ -7,6 +7,7 @@ namespace RestAPI_Exercise.Infrastructure.Entities;
 [Table("product_stock")]
 public class ProductStockEntity
 {
+    [Column("id")]
     [Key] // 主キーをマッピング
     // 列名と同じ名称のプロパティなので[Column]は使わない
     public int Id { get; set; }
@@ -16,6 +17,7 @@ public class ProductStockEntity
     [Column("stock_uuid")]// マッピングする列名
     public string StockUuid { get; set; } = string.Empty;
 
+    [Column("stock")]
     [Required] // NOT NULL
     // 列名と同じ名称のプロパティなので[Column]は使わない
     public int Stock { get; set; }

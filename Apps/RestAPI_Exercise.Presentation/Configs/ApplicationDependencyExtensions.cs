@@ -52,16 +52,19 @@ public static class ApplicationDependencyExtensions
         this IServiceCollection services, IConfiguration config)
     {
         // MySQLの接続文字列を設定ファイルから取得する
-        var connectstr = config.GetConnectionString("MySqlConnection");
+        var connectstr = config.GetConnectionString("PostgreSQLConnection");
         // AddDbContextをサービスコレクションに登録する
         services.AddDbContext<AppDbContext>(options =>
         {
             // データベース操作ログをデバッグレベルでコンソールに出力する
             options.LogTo(Console.WriteLine, LogLevel.Debug);
-            // MySQLのデータベースを指定された接続文字列を使用して構成
-            // AutoDetectは接続文字列を基にMySQLのサーバーバージョンを自動的に検出
-            options.UseMySql(connectstr, ServerVersion.AutoDetect(connectstr));
+            // PostgreSQLのデータベースを指定された接続文字列を使用して構成
+            options.UseNpgsql(connectstr);
         });
+        
+        
+        
+        
         // ドメインオブジェクト:ProductSctockとProductStockEntityの相互変換クラス
         services.AddScoped<ProductStockEntityAdapter>();
         // ドメインオブジェクト:ProductCategoryとProductCategoryEntityの相互変換クラス
@@ -91,6 +94,7 @@ public static class ApplicationDependencyExtensions
     /// アプリケーション層の依存関係を追加
     /// </summary>
     /// <param name="services">依存関係注入(DI)のサービスコレクション</param>
+    /// <param name="config"></param>
     /// <returns></returns>
     private static IServiceCollection AddApplicationLayerDependencies(
         this IServiceCollection services, IConfiguration config)
@@ -120,6 +124,7 @@ public static class ApplicationDependencyExtensions
     /// プレゼンテーション層の依存関係を追加
     /// </summary>
     /// <param name="services">依存関係注入(DI)のサービスコレクション</param>
+    /// <param name="config"></param>
     /// <returns></returns>
     private static IServiceCollection AddPresentationLayerDependencies(
         this IServiceCollection services, IConfiguration config)
