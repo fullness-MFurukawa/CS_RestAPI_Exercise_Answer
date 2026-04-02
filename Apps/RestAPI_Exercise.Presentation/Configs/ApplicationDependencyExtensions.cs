@@ -51,7 +51,7 @@ public static class ApplicationDependencyExtensions
     private static IServiceCollection AddInfrastructureDependencies(
         this IServiceCollection services, IConfiguration config)
     {
-        // MySQLの接続文字列を設定ファイルから取得する
+        // PostgreSQLの接続文字列を設定ファイルから取得する
         var connectstr = config.GetConnectionString("PostgreSQLConnection");
         // AddDbContextをサービスコレクションに登録する
         services.AddDbContext<AppDbContext>(options =>

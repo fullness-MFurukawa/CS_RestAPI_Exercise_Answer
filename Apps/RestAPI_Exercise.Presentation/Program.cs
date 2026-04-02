@@ -38,7 +38,7 @@ builder.WebHost.ConfigureKestrel(options =>
 // WebApplicationを生成する
 var app = builder.Build();
 
-// 開発環境のみSwaggerを有効化
+
 // 開発環境のみSwaggerを有効化
 if (app.Environment.IsDevelopment())
 {
