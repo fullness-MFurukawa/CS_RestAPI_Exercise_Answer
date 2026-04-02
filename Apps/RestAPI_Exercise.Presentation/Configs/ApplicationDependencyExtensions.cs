@@ -63,8 +63,6 @@ public static class ApplicationDependencyExtensions
         });
         
         
-        
-        
         // ドメインオブジェクト:ProductSctockとProductStockEntityの相互変換クラス
         services.AddScoped<ProductStockEntityAdapter>();
         // ドメインオブジェクト:ProductCategoryとProductCategoryEntityの相互変換クラス

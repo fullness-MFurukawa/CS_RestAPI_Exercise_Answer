@@ -8,7 +8,7 @@ namespace RestAPI_Exercise.Presentation.Controllers;
 /// ユースケース:[商品をキーワード検索する]を実現するコントローラ
 /// </summary>
 [ApiController]
-[Route("api/products")]
+[Route("api/    ")]
 // タググループに反映されるコントローラの概要
 [SwaggerTag("商品をキーワード検索API")]
 public class SearchProductByKeywordController : ControllerBase

@@ -1,5 +1,25 @@
+//using Microsoft.AspNetCore.Identity;
+//using RestAPI_Exercise.Application.Domains.Models;
+//using RestAPI_Exercise.Application.Security;
 using RestAPI_Exercise.Presentation.Configs;
+
+
+// --- ここから：一時的なハッシュ生成用コード ---
+//var hasher = new PasswordHasher<User>();
+//var hashingService = new PBKDF2PasswordHashingService(hasher);
+
+//string hash1 = hashingService.Hash("passYamada");
+//string hash2 = hashingService.Hash("passTanaka");
+
+//Console.WriteLine("\n========== テスト用パスワードハッシュ ==========");
+//Console.WriteLine($"ユーザー1 (passYamada) : {hash1}");
+//Console.WriteLine($"ユーザー2 (passTanaka) : {hash2}");
+//Console.WriteLine("================================================\n");
+// --- ここまで ---
+
+
 var builder = WebApplication.CreateBuilder(args);
+
 
 // 依存関係(DI)の設定
 ApplicationDependencyExtensions
@@ -19,6 +39,7 @@ builder.WebHost.ConfigureKestrel(options =>
 var app = builder.Build();
 
 // 開発環境のみSwaggerを有効化
+// 開発環境のみSwaggerを有効化
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -27,11 +48,8 @@ if (app.Environment.IsDevelopment())
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "RestAPI Exercise v1");
         c.RoutePrefix = string.Empty; // ルートURLでUIを開く
 
-        // SwaggerがCookieを含めてリクエスト/レスポンスするようにする
-        c.ConfigObject.AdditionalItems["requestInterceptor"] =
-        new Microsoft.OpenApi.Any.OpenApiString(
-            "request => { request.credentials = 'include'; return request; }"
-        );
+        // UseRequestInterceptor メソッドを使用する
+        c.UseRequestInterceptor("(request) => { request.credentials = 'include'; return request; }");
     });
 }
 

@@ -70,9 +70,35 @@ INSERT INTO product (product_uuid, name, price, category_id) VALUES
 ('dc2e5a33-a2b7-4414-9a53-f9750e7da8ed','無線式キーボード',1900,3);
 
 
-INSERT INTO product_stock (stock_uuid, stock, product_id)
-SELECT gen_random_uuid(), 100, id
-FROM product;
+INSERT INTO product_stock (stock_uuid, stock, product_id) VALUES
+('80ad9abf-5575-454a-bc7d-3068fa3077e8', 100, 1),
+('684b2cb1-7c4d-4b56-9975-e7facd06ab23', 100, 2),
+('f96f9d17-ae04-4205-820c-6895719eee78', 100, 3),
+('a525cc53-dc0e-42d9-889f-b3fb2f1277d7', 100, 4),
+('ff01a4b2-822e-462a-b200-2165bd07c618', 100, 5),
+('d1628caa-3427-4374-b1fc-4cbd923b60b9', 100, 6),
+('45a6b979-b0bc-400f-a450-88e554accb56', 100, 7),
+('04266bd3-09ce-4a41-bb95-47a98c2f056b', 100, 8),
+('0adcd322-cb08-4804-b8da-35cdf841b8c3', 100, 9),
+('104f63a3-7c5c-4c74-84a1-c3bfa65a2bc4', 100, 10),
+('3a3d43d8-2402-4517-98b9-72b6dea4b358', 100, 11),
+('b3e88c96-f945-4e28-a8f2-b65ef9e40b87', 100, 12),
+('1f00769c-c715-496b-b1e1-65df2305dff5', 100, 13),
+('0a30b5eb-0ae0-44de-8b7f-4704d2948c79', 100, 14),
+('148947c8-72f5-4a38-bfc7-587eed0d9011', 100, 15),
+('d22db9d1-8ebf-4561-966f-18e0e17c966b', 100, 16),
+('39a4f298-a87b-49c0-b1e9-42d29208f67e', 100, 17),
+('5eff83e8-7bec-4c07-ac84-41c11f4fd868', 100, 18),
+('6715c517-40d8-4d0f-9b79-979e84af4ee5', 100, 19),
+('d4b326c7-7071-42d9-8183-bc49f23b7830', 100, 20),
+('c4302573-6ac4-4252-aa42-a933d48e3748', 100, 21),
+('e9749bee-c050-4622-a26f-30032a1b822b', 100, 22),
+('65730621-b6bd-4bdd-811a-01d70a943766', 100, 23),
+('92acb83f-da7c-43d0-90d2-a2609350b865', 100, 24),
+('6805b314-0bd6-4f1d-adfe-c14d4ae6d3e7', 100, 25),
+('68922056-8025-4bf3-bd18-37d7b6a6f4c7', 100, 26),
+('d51a02f3-2a22-4bda-a302-7ae0b06d6046', 100, 27),
+('6a0e83a1-9e6d-4c55-9d0c-4e0dd5957af2', 100, 28);
 
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
@@ -83,7 +109,7 @@ END;
 $$ language 'plpgsql';
 
 CREATE TABLE users (
-    user_id       INT          GENERATED ALWAYS AS IDENTITY (START WITH 51) PRIMARY KEY,
+    user_id       INT         GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     user_uuid     UUID         NOT NULL UNIQUE,
     username      VARCHAR(30)  NOT NULL UNIQUE,
     email         VARCHAR(100) NOT NULL UNIQUE,
@@ -96,3 +122,17 @@ CREATE TRIGGER update_users_updated_at
 BEFORE UPDATE ON users
 FOR EACH ROW
 EXECUTE FUNCTION update_updated_at_column();
+
+INSERT INTO users (user_uuid, username, email, password_hash) VALUES
+(
+    '47f43b25-65c7-4993-a095-df55fc6bff61', 
+    'yamada', 
+    'yamada@example.com',    
+    'AQAAAAIAAYagAAAAEDCrBvGA6zsEmsZOV3sQicBL2WCrRFyjmLZ7nw1TEOhSTwrlCbAy79r0mcOAjrw/LQ=='
+),
+(
+    '35a30556-0efd-4c2e-871f-d9e8494b5f0f', 
+    'tanaka', 
+    'tanaka@example.com', 
+    'AQAAAAIAAYagAAAAEJRelamSVCZALwErdKxzfMOYELRciEg2rVkFqo25+ankQSMAnqWzK9ghI9ml2d7nkw=='
+);

@@ -18,7 +18,7 @@ public interface IPasswordHashingService
     /// <param name="providedPassword">平文のパスワード</param>
     /// <returns>true:一致、false:不一致</returns>
     /// <exception cref="PasswordRehashNeededException">
-    /// 　パスワードは一致したが、ハッシュの形式や強度が古い場合にスローされる
+    /// パスワードは一致したが、ハッシュの形式や強度が古い場合にスローされる
     /// </exception>
     bool Verify(string hashedPassword, string providedPassword);
 }
