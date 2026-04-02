@@ -1,6 +1,6 @@
 {
   "files.exclude": {
-    "Apps/**/bin": false,
+    "Apps/**/bin": true,
     "Apps/**/obj": true,
     "Tests/**/bin": true,
     "Tests/**/obj": true,
