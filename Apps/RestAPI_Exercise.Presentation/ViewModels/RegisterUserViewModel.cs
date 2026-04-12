@@ -10,7 +10,7 @@ public class RegisterUserViewModel
     /// </summary>
     [Required(ErrorMessage = "ユーザー名は必須です。")]
     [StringLength(30, MinimumLength = 3
-        , ErrorMessage = "ユーザー名は{1}文字以上、{2}文字以内で入力してください。")]
+        , ErrorMessage = "ユーザー名は{2}文字以上、{1}文字以内で入力してください。")]
     public string Username { get; init; } = string.Empty;
 
     /// <summary>
@@ -26,7 +26,7 @@ public class RegisterUserViewModel
     /// </summary>
     [Required(ErrorMessage = "パスワードは必須です。")]
     [StringLength(12, MinimumLength = 8
-        , ErrorMessage = "パスワードは{1}文字以上、{2}文字以内で入力してください。")]
+        , ErrorMessage = "パスワードは{2}文字以上、{1}文字以内で入力してください。")]
     public string Password { get; init; } = string.Empty;
 
     public override string ToString()
