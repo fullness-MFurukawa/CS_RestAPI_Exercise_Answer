@@ -32,7 +32,7 @@ public class SearchProductByKeywordController : ControllerBase
     [HttpGet]
     [SwaggerResponse(StatusCodes.Status200OK, "検索に成功した場合、商品リストを返す", typeof(List<Product>))]
     [SwaggerResponse(StatusCodes.Status400BadRequest, "キーワード未入力など、リクエストが不正な場合")]
-    public async Task<IActionResult> Search([FromQuery] string keyword)
+    public async Task<IActionResult> Search([FromQuery] string? keyword)
     {
         // 未入力チェック
         if (string.IsNullOrWhiteSpace(keyword))
